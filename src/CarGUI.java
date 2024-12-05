@@ -5,6 +5,7 @@
  */
 
 import javax.swing.*;
+import java.util.*;
 
 public class CarGUI extends JFrame {
     private CarGUIPanel hashAssign2Panel = new CarGUIPanel();
