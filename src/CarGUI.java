@@ -7,12 +7,12 @@
 import javax.swing.*;
 
 public class CarGUI extends JFrame {
-    private CarGUIPanel hashAssign2Panel = new CarGUIPanel();
+    private final CarGUIPanel panel = new CarGUIPanel();
 
     public CarGUI() {
         super("Car GUI");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        add(hashAssign2Panel);
+        add(panel);
         pack();
         setVisible(true);
     }
