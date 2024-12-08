@@ -1,5 +1,7 @@
 /*
- * A vector class that represents a point in 2D space and its angle - in degrees.
+ * Vector.java
+ * Ario Barin Ostovary
+ * 
  */
 
 public class Vector {
@@ -9,32 +11,41 @@ public class Vector {
     public Vector(double x, double y, double angle) {
         this.x = x;
         this.y = y;
-        this.angle = angle; // in degrees
+        this.angle = angle; // in radians
     }
 
-    public double getX() {
-        return x;
-    }
-    
-    public double getY() {
-        return y;
-    }
+    public double getX() { return x; }
+    public double getY() { return y; }
+    public double getAngle() { return angle; }
 
-    public double getAngle() {
-        return angle;
-    }
+    public void setAngle(double angle) { this.angle = angle % (2 * Math.PI); }
 
     public void move(double distance) {
-        x += distance * Math.cos(Math.toRadians(angle));
-        y += distance * Math.sin(Math.toRadians(angle));
+        x += distance * Math.cos(angle);
+        y += distance * Math.sin(angle);
+    }
+
+    public void moveXY(double x, double y) {
+        this.x += x;
+        this.y += y;
+    }
+
+    public void setXY(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public void move(double distance, double angle) {
+        x += distance * Math.cos(angle);
+        y += distance * Math.sin(angle);
     }
 
     public void rotate(double degrees) {
-        angle += degrees;
+        angle = (angle + degrees) % (2 * Math.PI);
     }
 
     public double angleDifference(Vector other) {
-        return angle - other.angle;
+        return (angle - other.angle + Math.PI) % (2 * Math.PI) - Math.PI;
     }
 
     public double distance(Vector other) {
@@ -43,6 +54,5 @@ public class Vector {
 
     public Vector copy() {
         return new Vector(x, y, angle);
-        
     }
 }

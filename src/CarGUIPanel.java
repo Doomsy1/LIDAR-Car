@@ -2,7 +2,7 @@
  * CarGUIPanel.java
  * Ario Barin Ostovary & Kevin Dang
  * 
- */
+  */
 
 import java.awt.*;
 import java.awt.event.*;
@@ -10,8 +10,8 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class CarGUIPanel extends JPanel implements KeyListener, ActionListener, MouseListener, MouseMotionListener {
-    private static final int WIDTH = 800, HEIGHT = 600;
-    private static final int FPS = 50;
+    public static final int WIDTH = 800, HEIGHT = 600;
+    private static final int FPS = 60;
     private final boolean[] keysPressed;
 
     private final Timer timer;
@@ -21,10 +21,10 @@ public class CarGUIPanel extends JPanel implements KeyListener, ActionListener, 
     public CarGUIPanel() {
         keysPressed = new boolean[KeyEvent.KEY_LAST + 1];
 
-        car = new Car(WIDTH / 2, HEIGHT / 2, 100, 10, 100);
+        setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        car = new Car(WIDTH / 2, HEIGHT / 2);
         car.setMovementKeys(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D);
 
-        setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setFocusable(true);
         requestFocus();
         addKeyListener(this);
@@ -36,52 +36,75 @@ public class CarGUIPanel extends JPanel implements KeyListener, ActionListener, 
         timer.start();
     }
 
+    public void step() {
+        car.update(keysPressed);
+    }
+
     @Override
     public void keyPressed(KeyEvent e) {
-        keysPressed[e.getKeyCode()] = true;
+        if (e.getKeyCode() < keysPressed.length) {
+            keysPressed[e.getKeyCode()] = true;
+        }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        keysPressed[e.getKeyCode()] = false;
+        if (e.getKeyCode() < keysPressed.length) {
+            keysPressed[e.getKeyCode()] = false;
+        }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        // Not used
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        // Not used
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
+        // Not used
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        // Not used
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
+        // Not used
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
+        // Not used
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
+        // Not used
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
+        // Not used
     }
 
     @Override
     public void paint(Graphics g) {
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, getWidth(), getHeight());
+
         car.draw(g);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        car.update();
+        step();
         repaint();
     }
 }

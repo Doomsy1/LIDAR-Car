@@ -5,7 +5,6 @@
  */
 
 import javax.swing.*;
-import java.util.*;
 
 public class CarGUI extends JFrame {
     CarGUIPanel panel = new CarGUIPanel();
