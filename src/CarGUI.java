@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.util.*;
 
 public class CarGUI extends JFrame {
-    private final CarGUIPanel panel = new CarGUIPanel();
+    CarGUIPanel panel = new CarGUIPanel();
 
     public CarGUI() {
         super("Car GUI");
@@ -22,4 +22,3 @@ public class CarGUI extends JFrame {
         new CarGUI();
     }
 }
-
