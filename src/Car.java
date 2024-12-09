@@ -66,7 +66,7 @@ public class Car {
         this.straightenFactor = 0.5;
         
         // Dimensions
-        this.length = 100;
+        this.length = 40;
         this.width = 100;
         this.tireLength = 15;
         this.tireWidth = 7;
@@ -78,6 +78,16 @@ public class Car {
         backTire = frontTire.copy();
         frontTire.move(length / 2, heading);
         backTire.move(-length / 2, heading);
+    }
+
+    public int getX() {
+        // Return the middle of front tire and back tire
+        return (int) ((frontTire.getX() + backTire.getX()) / 2);
+    }
+
+    public int getY() {
+        // Return the middle of front tire and back tire
+        return (int) ((frontTire.getY() + backTire.getY()) / 2);
     }
 
     public void setMovementKeys(int moveForward, int moveBackward, int rotateAntiClockwise, int rotateClockwise) {

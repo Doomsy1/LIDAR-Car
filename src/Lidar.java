@@ -1,5 +1,3 @@
-import java.util.*;
-import java.util.ArrayList;
 import java.awt.*;
 
 
@@ -16,11 +14,6 @@ class Lidar{
     public static final int RPM = 60;
     private final int LIDAR_RADIUS = 10;
 
-    private ArrayList<Laser> lasers = new ArrayList<Laser>();
-    private ArrayList<LidarReading> readings = new ArrayList<LidarReading>();
-
-
-    
     public Lidar(int x, int y){
         this.x = x;
         this.y = y;
@@ -52,12 +45,6 @@ class Lidar{
         g.drawOval(x-LIDAR_RADIUS/2, y-LIDAR_RADIUS/2, LIDAR_RADIUS, LIDAR_RADIUS);
     }
 
-    public int getX(){
-        return x;
-    }  
-    public int getY(){
-        return y;
-    }
     public int getBearing(){
         return bearing;
     }

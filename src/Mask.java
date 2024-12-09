@@ -30,11 +30,7 @@ class Mask{
 		if(x<0 || x>= mask.getWidth(null) || y<0 || y>= mask.getHeight(null)){
 			return false;
 		}
-		if(pixel != AIR.getRGB()){
-			return false;
-		}
-
-		return true;
+		return pixel == AIR.getRGB();
 
 	}	
 
