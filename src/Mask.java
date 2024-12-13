@@ -1,13 +1,15 @@
+/*
+ * Mask.java
+ * Kevin Dang
+ * 
+ */
+
 import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
 import javax.imageio.ImageIO;
 
-
-class Mask{
-
-
-
+class Mask {
 	private static Image mask;
 	private static Image bg;
 
@@ -20,18 +22,26 @@ class Mask{
 		}
 	}
 
-	public static final Color AIR = new Color(255,174,201);
+	public static final Color AIR = new Color(255, 174, 201);
 
-    public static boolean clear(int x, int y){
-
+	public static boolean clear(int x, int y) {
 		BufferedImage bufferedMask = (BufferedImage) mask;
 		int pixel = bufferedMask.getRGB(x, y);
-
-		if(x<0 || x>= mask.getWidth(null) || y<0 || y>= mask.getHeight(null)){
+		if (x < 0 || x >= mask.getWidth(null) || y < 0 || y >= mask.getHeight(null)) {
 			return false;
 		}
 		return pixel == AIR.getRGB();
+	}
 
-	}	
+	public static void draw(Graphics g) {
+		g.drawImage(bg, 0, 0, null);
+	}
 
+	public static int getWidth() {
+		return CarGUIPanel.BASE_WIDTH;
+	}
+
+	public static int getHeight() {
+		return CarGUIPanel.BASE_HEIGHT;
+	}
 }
