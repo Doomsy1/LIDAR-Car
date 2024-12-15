@@ -17,7 +17,7 @@ public class LiCar {
     public LiCar(int x, int y) {
         tank = new Tank(x, y);
         lidar = new Lidar();
-        lidarScansPerFrame = 5;
+        lidarScansPerFrame = 1;
         lidarReadings = new ArrayList<>();
     }
 

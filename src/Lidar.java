@@ -12,6 +12,8 @@ class Lidar {
     public final double minDistance;
     public final double maxDistance;
     public final double lidarRadius;
+    public final double noise;
+
 
     public Lidar() {
         this.bearing = new Angle(0);
@@ -19,6 +21,7 @@ class Lidar {
         this.minDistance = 75;
         this.maxDistance = 200;
         this.lidarRadius = 10;
+        this.noise = 5;
     }
 
     public Angle getBearing() {
@@ -33,6 +36,10 @@ class Lidar {
         bearing.rotate(angle);
     }
 
+    public double randomizeReading(double reading) {
+        return reading + new java.util.Random().nextGaussian() * noise;
+    }
+
     public double read(int x, int y) {
         Point start = new Point(x, y);
         DirectedPoint beam = new DirectedPoint(x, y, bearing);
@@ -40,13 +47,13 @@ class Lidar {
             beam.move(1);
             if (beam.getX() < 0 || beam.getY() < 0 || beam.getX() > Mask.getWidth() || beam.getY() > Mask.getHeight()) {
                 if (start.distance(beam.getX(), beam.getY()) > minDistance) {
-                    return start.distance(beam.getX(), beam.getY());
+                    return randomizeReading(start.distance(beam.getX(), beam.getY()));
                 }
                 return -1;
             }
             if (!Mask.clear((int) beam.getX(), (int) beam.getY())) {
                 if (start.distance(beam.getX(), beam.getY()) > minDistance) {
-                    return start.distance(beam.getX(), beam.getY());
+                    return randomizeReading(start.distance(beam.getX(), beam.getY()));
                 }
                 return -1;
             }
