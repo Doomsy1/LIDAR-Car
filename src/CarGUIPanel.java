@@ -13,32 +13,40 @@ import javax.swing.Timer;
 public class CarGUIPanel extends JPanel implements KeyListener, ActionListener, MouseListener, MouseMotionListener {
     public static final int BASE_WIDTH = 800, BASE_HEIGHT = 600;
     private static final int FPS = 50;
+
+    // Array of keys pressed
     private final boolean[] keysPressed;
 
     private final Timer timer;
 
-    private final LiCar tank;
+    private final LiCar licar;
 
     public CarGUIPanel() {
         keysPressed = new boolean[KeyEvent.KEY_LAST + 1];
+        
+        licar = new LiCar(BASE_WIDTH / 2, BASE_HEIGHT / 2);
+        licar.setMovementKeys(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D);
+        
         setPreferredSize(new Dimension(BASE_WIDTH, BASE_HEIGHT));
-        tank = new LiCar(BASE_WIDTH / 2, BASE_HEIGHT / 2);
-        tank.setMovementKeys(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D);
         setFocusable(true);
         requestFocus();
+
         addKeyListener(this);
         addMouseListener(this);
         addMouseMotionListener(this);
+
+
         timer = new Timer(1000 / FPS, this);
         timer.start();
     }
 
     public void step() {
-        tank.update(keysPressed);
+        licar.update(keysPressed);
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
+        // if the key is pressed, set the corresponding index in the keysPressed array to true
         if (e.getKeyCode() < keysPressed.length) {
             keysPressed[e.getKeyCode()] = true;
         }
@@ -46,6 +54,7 @@ public class CarGUIPanel extends JPanel implements KeyListener, ActionListener, 
 
     @Override
     public void keyReleased(KeyEvent e) {
+        // if the key is released, set the corresponding index in the keysPressed array to false
         if (e.getKeyCode() < keysPressed.length) {
             keysPressed[e.getKeyCode()] = false;
         }
@@ -85,7 +94,6 @@ public class CarGUIPanel extends JPanel implements KeyListener, ActionListener, 
 
     @Override
     public void paint(Graphics g) {
-        super.paint(g);
         int currentWidth = getWidth();
         int currentHeight = getHeight();
 
@@ -97,7 +105,7 @@ public class CarGUIPanel extends JPanel implements KeyListener, ActionListener, 
         g2d.setColor(Color.WHITE);
         g2d.fillRect(0, 0, currentWidth, currentHeight);
 
-        DirectedPoint tankPosition = tank.getPosition();
+        DirectedPoint tankPosition = licar.getPosition();
         double tankX = tankPosition.getX();
         double tankY = tankPosition.getY();
         double tankAngle = tankPosition.getAngle().getAngle();
@@ -118,7 +126,7 @@ public class CarGUIPanel extends JPanel implements KeyListener, ActionListener, 
         g2d.rotate(-tankAngle - Math.PI / 2);
         g2d.translate(-tankX, -tankY);
         Mask.draw(g2d);
-        tank.draw(g2d);
+        licar.draw(g2d, true);
         g2d.setTransform(originalTransform);
 
         // Right view: lidar
@@ -129,7 +137,7 @@ public class CarGUIPanel extends JPanel implements KeyListener, ActionListener, 
         g2d.scale(scale, scale);
         g2d.rotate(-tankAngle - Math.PI / 2);
         g2d.translate(-tankX, -tankY);
-        tank.drawLidarView(g2d);
+        licar.drawLidarView(g2d, false);
         g2d.setTransform(originalTransform);
 
         g2d.dispose();

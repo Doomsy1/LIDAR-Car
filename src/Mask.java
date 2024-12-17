@@ -10,8 +10,8 @@ import java.io.*;
 import javax.imageio.ImageIO;
 
 class Mask {
-	private static Image mask;
-	private static Image bg;
+	private static Image mask; // Mask image
+	private static Image bg; // Background image
 
 	static {
 		try {
@@ -27,9 +27,13 @@ class Mask {
 	public static boolean clear(int x, int y) {
 		BufferedImage bufferedMask = (BufferedImage) mask;
 		int pixel = bufferedMask.getRGB(x, y);
+
+		// Check if the pixel is out of bounds
 		if (x < 0 || x >= mask.getWidth(null) || y < 0 || y >= mask.getHeight(null)) {
 			return false;
 		}
+
+		// Check if the pixel is clear
 		return pixel == AIR.getRGB();
 	}
 

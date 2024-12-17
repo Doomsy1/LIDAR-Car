@@ -17,7 +17,7 @@ public class LiCar {
     public LiCar(int x, int y) {
         tank = new Tank(x, y);
         lidar = new Lidar();
-        lidarScansPerFrame = 1;
+        lidarScansPerFrame = 50;
         lidarReadings = new ArrayList<>();
     }
 
@@ -46,23 +46,27 @@ public class LiCar {
         return tank.getPosition();
     }
 
-    public void draw(Graphics g) {
+    public void draw(Graphics g, boolean drawRays) {
         DirectedPoint tankPosition = tank.getPosition();
         lidar.draw(g, (int) tankPosition.getX(), (int) tankPosition.getY());
         tank.draw(g);
         for (Point p : lidarReadings) {
-            g.setColor(Color.RED);
-            g.drawLine((int) tankPosition.getX(), (int) tankPosition.getY(), (int) p.getX(), (int) p.getY());
+            if (drawRays) {
+                g.setColor(Color.RED);
+                g.drawLine((int) tankPosition.getX(), (int) tankPosition.getY(), (int) p.getX(), (int) p.getY());
+            }
             g.setColor(Color.GREEN);
             g.drawOval((int) p.getX() - 5, (int) p.getY() - 5, 10, 10);
         }
     }
 
-    public void drawLidarView(Graphics g) {
+    public void drawLidarView(Graphics g, boolean drawRays) {
         DirectedPoint tankPosition = tank.getPosition();
         for (Point p : lidarReadings) {
-            g.setColor(Color.RED);
-            g.drawLine((int) tankPosition.getX(), (int) tankPosition.getY(), (int) p.getX(), (int) p.getY());
+            if (drawRays) {
+                g.setColor(Color.RED);
+                g.drawLine((int) tankPosition.getX(), (int) tankPosition.getY(), (int) p.getX(), (int) p.getY());
+            }
             g.setColor(Color.GREEN);
             g.drawOval((int) p.getX() - 3, (int) p.getY() - 3, 6, 6);
         }

@@ -30,6 +30,7 @@ public class Point {
     }
 
     public void move(double distance, Angle angle) {
+        // Move the point by the given distance and angle
         x += distance * angle.getCos();
         y += distance * angle.getSin();
     }
