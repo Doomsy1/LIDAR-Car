@@ -4,13 +4,15 @@
  * 
  */
 
+// (d1 * L) / (d2 - d1) = r
+// d1 / r = (theta)
+
+
+
 import java.awt.Color;
 import java.awt.Graphics;
 
 public class Tank {
-    // Tank position
-    private final DirectedPoint position;
-
     // Movement keys
     private int moveForward, moveBackward, rotateAntiClockwise, rotateClockwise;
 
@@ -42,9 +44,7 @@ public class Tank {
     private final double secondaryTireLength;
     private final double secondaryTireWidth;
 
-    public Tank(int x, int y) {
-        position = new DirectedPoint(x, y, 0);
-
+    public Tank() {
         // Movement Constants
         this.maxSpeed = 5;
         this.maxAcceleration = 0.5;
@@ -67,15 +67,15 @@ public class Tank {
         this.tankLength = 150;
         this.tankWidth = 50;
 
-        this.driveTireLength = 10;
-        this.driveTireWidth = 5;
+        this.driveTireLength = 16;
+        this.driveTireWidth = 10;
         
         this.secondaryTireLength = 10;
-        this.secondaryTireWidth = 5;
+        this.secondaryTireWidth = 6;
     }
 
-    public DirectedPoint getPosition() {
-        return position;
+    public double getSpeed() {
+        return speed;
     }
 
     public double getRotationSpeed() {
@@ -115,35 +115,31 @@ public class Tank {
         // Update rotation speed based on rotation acceleration
         rotationSpeed += rotationAcceleration;
         rotationSpeed *= rotationFriction;
-
-        // Update position based on speed and rotation speed
-        position.rotate(rotationSpeed);
-        position.move(speed);
     }
 
-    public void drawTire(Graphics g, DirectedPoint tire, Color color) {
+    public void drawTire(Graphics g, DirectedPoint tire, Color color, double length, double width) {
         g.setColor(color);
         Angle angle = tire.getAngle();
         int[] xPoints = new int[4];
         int[] yPoints = new int[4];
 
         // Calculate the points of the tire
-        xPoints[0] = (int) (tire.getX() - (driveTireLength / 2) * angle.getCos() - (driveTireWidth / 2) * angle.getSin());
-        yPoints[0] = (int) (tire.getY() - (driveTireLength / 2) * angle.getSin() + (driveTireWidth / 2) * angle.getCos());
+        xPoints[0] = (int) (tire.getX() - (length / 2) * angle.getCos() - (width / 2) * angle.getSin());
+        yPoints[0] = (int) (tire.getY() - (length / 2) * angle.getSin() + (width / 2) * angle.getCos());
 
-        xPoints[1] = (int) (tire.getX() + (driveTireLength / 2) * angle.getCos() - (driveTireWidth / 2) * angle.getSin());
-        yPoints[1] = (int) (tire.getY() + (driveTireLength / 2) * angle.getSin() + (driveTireWidth / 2) * angle.getCos());
+        xPoints[1] = (int) (tire.getX() + (length / 2) * angle.getCos() - (width / 2) * angle.getSin());
+        yPoints[1] = (int) (tire.getY() + (length / 2) * angle.getSin() + (width / 2) * angle.getCos());
 
-        xPoints[2] = (int) (tire.getX() + (driveTireLength / 2) * angle.getCos() + (driveTireWidth / 2) * angle.getSin());
-        yPoints[2] = (int) (tire.getY() + (driveTireLength / 2) * angle.getSin() - (driveTireWidth / 2) * angle.getCos());
+        xPoints[2] = (int) (tire.getX() + (length / 2) * angle.getCos() + (width / 2) * angle.getSin());
+        yPoints[2] = (int) (tire.getY() + (length / 2) * angle.getSin() - (width / 2) * angle.getCos());
 
-        xPoints[3] = (int) (tire.getX() - (driveTireLength / 2) * angle.getCos() + (driveTireWidth / 2) * angle.getSin());
-        yPoints[3] = (int) (tire.getY() - (driveTireLength / 2) * angle.getSin() - (driveTireWidth / 2) * angle.getCos());
+        xPoints[3] = (int) (tire.getX() - (length / 2) * angle.getCos() + (width / 2) * angle.getSin());
+        yPoints[3] = (int) (tire.getY() - (length / 2) * angle.getSin() - (width / 2) * angle.getCos());
 
         g.fillPolygon(xPoints, yPoints, 4);
     }
 
-    public void draw(Graphics g) {
+    public void draw(Graphics g, DirectedPoint position) {
         Angle perpendicularAngle = position.getAngle();
         perpendicularAngle.rotate(Math.PI / 2);
 
@@ -153,8 +149,8 @@ public class Tank {
         DirectedPoint middleRight = position.copy();
         middleRight.move(-tankWidth / 2, perpendicularAngle);
 
-        drawTire(g, middleLeft, Color.RED);
-        drawTire(g, middleRight, Color.RED);
+        drawTire(g, middleLeft, Color.RED, driveTireLength, driveTireWidth);
+        drawTire(g, middleRight, Color.RED, driveTireLength, driveTireWidth);
 
         DirectedPoint frontLeft = middleLeft.copy();
         frontLeft.move(tankLength / 3);
@@ -162,8 +158,8 @@ public class Tank {
         DirectedPoint frontRight = middleRight.copy();
         frontRight.move(tankLength / 3);
 
-        drawTire(g, frontLeft, Color.GREEN);
-        drawTire(g, frontRight, Color.GREEN);
+        drawTire(g, frontLeft, Color.GREEN, secondaryTireLength, secondaryTireWidth);
+        drawTire(g, frontRight, Color.GREEN, secondaryTireLength, secondaryTireWidth);
 
         DirectedPoint backLeft = middleLeft.copy();
         backLeft.move(-tankLength / 3);
@@ -171,7 +167,7 @@ public class Tank {
         DirectedPoint backRight = middleRight.copy();
         backRight.move(-tankLength / 3);
 
-        drawTire(g, backLeft, Color.BLUE);
-        drawTire(g, backRight, Color.BLUE);
+        drawTire(g, backLeft, Color.BLUE, secondaryTireLength, secondaryTireWidth);
+        drawTire(g, backRight, Color.BLUE, secondaryTireLength, secondaryTireWidth);
     }
 }

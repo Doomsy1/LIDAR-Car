@@ -64,6 +64,10 @@ public class DirectedPoint {
         point.move(distance, angle);
     }
 
+    public void move(Vector vector) {
+        point.move(vector.getMagnitude(), vector.getDirection());
+    }
+
     public void rotate(double degrees) {
         angle.rotate(degrees);
     }
@@ -74,10 +78,5 @@ public class DirectedPoint {
 
     public DirectedPoint copy() {
         return new DirectedPoint(point.copy(), angle.getAngle());
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (point.getX() + point.getY() + angle.getAngle());
     }
 }

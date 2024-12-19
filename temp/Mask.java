@@ -38,7 +38,9 @@ class Mask {
 	}
 
 	public static void draw(Graphics g) {
-		g.drawImage(bg, 0, 0, null);
+		// Scale the background image to the screen size
+		Rectangle clipBounds = g.getClipBounds();
+		g.drawImage(bg, 0, 0, clipBounds.width, clipBounds.height, null);
 	}
 
 	public static int getWidth() {
