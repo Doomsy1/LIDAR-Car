@@ -3,6 +3,7 @@
  * Ario Barin Ostovary
  * 
  */
+
 public class DirectedPoint {
     private final Point point;
     private final Angle angle;

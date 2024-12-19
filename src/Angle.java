@@ -3,6 +3,7 @@
  * Ario Barin Ostovary
  * 
  */
+
 public class Angle {
     private double angle; // in radians
 
