@@ -40,5 +40,23 @@ public class LiCar {
             }
         }
     }
+
+    public void drawCar(Graphics g) {
+        tank.draw(g);
+        lidar.draw(g, tank.getPosition());
+    }
+
+    public void drawRays(Graphics g) {
+        for (Vector ray : lidarReadings) {
+            g.drawLine((int) tank.getPosition().getX(), (int) tank.getPosition().getY(), (int) ray.getEnd().getX(),
+                    (int) ray.getEnd().getY());
+        }
+    }
+    
+    public void drawReadings(Graphics g) {
+        for (Vector reading : lidarReadings) {
+            g.drawOval((int) reading.getEnd().getX() - 3, (int) reading.getEnd().getY() - 3, 6, 6);
+        }
+    }
 }
 

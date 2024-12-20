@@ -63,15 +63,27 @@ public class World {
         return HEIGHT;
     }
 
-    public void drawStatic(Graphics g, boolean showMap, boolean showLidarOnMap, boolean showRaysOnMap) {
+    public void drawStatic(Graphics g, boolean showMap, boolean showReadingsOnMap, boolean showRaysOnMap) {
         // Static drawing of the full world with car placed on the map
 
         // scale the image to the size of the window
         Image scaledImage = bg.getScaledInstance(getWidth(), getHeight(), Image.SCALE_SMOOTH);
-        g.drawImage(scaledImage, 0, 0, null);
+        if (showMap) {
+            g.drawImage(scaledImage, 0, 0, null);
+        }
 
         // draw the car on the map
-        licar.draw(g, carPosition, showRaysOnMap, showLidarOnMap);
+        licar.drawCar(g);
+
+        // draw the rays on the map
+        if (showRaysOnMap) {
+            licar.drawRays(g);
+        }
+
+        // draw the readings on the map
+        if (showReadingsOnMap) {
+            licar.drawReadings(g);
+        }
     }
 }
 

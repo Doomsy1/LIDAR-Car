@@ -35,7 +35,8 @@ public class Lidar {
     }
 
     public double read(DirectedPoint carPosition) {
-        // gives the distance to the nearest object in the direction the lidar is pointing
+        // gives the distance to the nearest object in the direction the lidar is
+        // pointing
         DirectedPoint beam = new DirectedPoint(carPosition.getX(), carPosition.getY(), bearing);
         beam.rotate(bearing);
 
@@ -53,14 +54,15 @@ public class Lidar {
         return -1;
     }
 
-    public void draw(Graphics g, int x, int y) {
+    public void draw(Graphics g, DirectedPoint carPosition) {
         g.setColor(new Color(10, 10, 10, 32));
-        g.drawOval((int) (x - lidarRadius / 2), (int) (y - lidarRadius / 2), (int) lidarRadius, (int) lidarRadius);
+        g.drawOval((int) (carPosition.getX() - lidarRadius / 2), (int) (carPosition.getY() - lidarRadius / 2),
+                (int) lidarRadius, (int) lidarRadius);
 
         // Draw where the lidar is pointing
-        DirectedPoint sensor = new DirectedPoint(x, y, bearing);
+        DirectedPoint sensor = new DirectedPoint(carPosition.getX(), carPosition.getY(), bearing);
+        sensor.rotate(bearing);
         sensor.move(maxDistance, bearing);
-        g.drawLine((int) x, (int) y, (int) sensor.getX(), (int) sensor.getY());
+        g.drawLine((int) carPosition.getX(), (int) carPosition.getY(), (int) sensor.getX(), (int) sensor.getY());
     }
 }
-
