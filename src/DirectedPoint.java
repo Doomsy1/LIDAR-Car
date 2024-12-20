@@ -73,6 +73,10 @@ public class DirectedPoint {
         angle.rotate(degrees);
     }
 
+    public void rotate(Angle angle) {
+        this.angle.rotate(angle.getAngle());
+    }
+
     public double distance(DirectedPoint other) {
         return point.distance(other.getPoint());
     }

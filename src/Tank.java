@@ -45,6 +45,10 @@ public class Tank {
         this.rightForward = rightForward;
         this.rightBackward = rightBackward;
     }
+    
+    public DirectedPoint getPosition() {
+        return position;
+    }
 
     public void update(boolean[] keys) {
         // Update acceleration
@@ -152,6 +156,7 @@ public class Tank {
         drawTire(g, backLeft, Color.BLUE, secondaryTireLength, secondaryTireWidth);
         drawTire(g, backRight, Color.BLUE, secondaryTireLength, secondaryTireWidth);
     }
+
 }
 
 
