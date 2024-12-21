@@ -74,7 +74,7 @@ public class DirectedPoint {
     }
 
     public void rotate(Angle angle) {
-        this.angle.rotate(angle.getAngle());
+        this.angle.rotate(angle.getRadians());
     }
 
     public double distance(DirectedPoint other) {
@@ -82,6 +82,6 @@ public class DirectedPoint {
     }
 
     public DirectedPoint copy() {
-        return new DirectedPoint(point.copy(), angle.getAngle());
+        return new DirectedPoint(point.copy(), angle.getRadians());
     }
 }

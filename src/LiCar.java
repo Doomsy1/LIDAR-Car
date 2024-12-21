@@ -4,7 +4,6 @@
  * 
  */
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
@@ -23,6 +22,10 @@ public class LiCar {
         this.lidar = new Lidar();
         this.tank = new Tank(x, y, angle);
         this.lidarReadings = new ArrayList<>();
+    }
+
+    public DirectedPoint getPosition() {
+        return tank.getPosition();
     }
 
     public void setMovementKeys(int leftForward, int leftBackward, int rightForward, int rightBackward) {
@@ -48,14 +51,13 @@ public class LiCar {
 
     public void drawRays(Graphics g) {
         for (Vector ray : lidarReadings) {
-            g.drawLine((int) tank.getPosition().getX(), (int) tank.getPosition().getY(), (int) ray.getEnd().getX(),
-                    (int) ray.getEnd().getY());
+            // TODO: draw the rays
         }
     }
     
     public void drawReadings(Graphics g) {
         for (Vector reading : lidarReadings) {
-            g.drawOval((int) reading.getEnd().getX() - 3, (int) reading.getEnd().getY() - 3, 6, 6);
+            // TODO: draw the readings
         }
     }
 }

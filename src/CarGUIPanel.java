@@ -112,8 +112,8 @@ public class CarGUIPanel extends JPanel implements KeyListener, ActionListener, 
         world.drawStatic(g2d, showMap, showLidarOnMap, showRaysOnMap);
 
         // Right View
-        g2d.setClip(getWidth() / 2, 0, getWidth() / 2, getHeight());
-        world.drawDynamic(g2d, showLidarOnMap, showRaysOnMap, true);
+        // g2d.setClip(getWidth() / 2, 0, getWidth() / 2, getHeight());
+        // world.drawDynamic(g2d, showLidarOnMap, showRaysOnMap, true);
     }
 }
 

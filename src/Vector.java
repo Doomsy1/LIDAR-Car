@@ -13,6 +13,11 @@ public class Vector {
         this.magnitude = magnitude;
     }
 
+    public Vector(Angle angle, double magnitude) {
+        this.direction = angle.getRadians();
+        this.magnitude = magnitude;
+    }
+
     public double getDirection() {
         return direction;
     }

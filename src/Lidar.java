@@ -30,6 +30,10 @@ public class Lidar {
         bearing.rotate(rotationPerFrame);
     }
 
+    public Angle getBearing() {
+        return bearing;
+    }
+
     public double randomizeReading(double reading) {
         return Utils.randomGaussian(reading, noise);
     }
