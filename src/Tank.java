@@ -16,14 +16,10 @@ public class Tank {
 
     // Movement Constants
     private final double maxSpeed = 5;
-    private final double maxAcceleration = 0.5;
-    private final double friction = maxSpeed / (maxSpeed + maxAcceleration);
 
     // Movement variables
     private double leftSpeed = 0;
     private double rightSpeed = 0;
-    private double leftAcceleration = 0;
-    private double rightAcceleration = 0;
 
     // Tank dimensions
     private final double tankLength = 150;
@@ -34,6 +30,9 @@ public class Tank {
 
     private final double secondaryTireLength = 10;
     private final double secondaryTireWidth = 6;
+
+    // Distance between the left and right wheels
+    private final double wheelBase = tankWidth; // Assuming tankWidth represents the distance between wheels
 
     public Tank(double x, double y, double angle) {
         position = new DirectedPoint(x, y, angle);
@@ -51,49 +50,48 @@ public class Tank {
     }
 
     public void update(boolean[] keys) {
-        // Update acceleration
-        leftAcceleration = 0;
-        rightAcceleration = 0;
-
         // Left side
-        if (keys[leftForward] && keys[leftBackward]) {} 
+        if (keys[leftForward] && keys[leftBackward]) { 
+            leftSpeed = 0;
+        } 
         else if (keys[leftForward]) {
-            leftAcceleration = maxAcceleration;
+            leftSpeed = maxSpeed;
         } 
         else if (keys[leftBackward]) {
-            leftAcceleration = -maxAcceleration;
+            leftSpeed = -maxSpeed;
+        }
+        else {
+            leftSpeed = 0;
         }
         
         // Right side
-        if (keys[rightForward] && keys[rightBackward]) {} 
+        if (keys[rightForward] && keys[rightBackward]) { 
+            rightSpeed = 0;
+        } 
         else if (keys[rightForward]) {
-            rightAcceleration = maxAcceleration;
+            rightSpeed = maxSpeed;
         } 
         else if (keys[rightBackward]) {
-            rightAcceleration = -maxAcceleration;
+            rightSpeed = -maxSpeed;
+        }
+        else {
+            rightSpeed = 0;
         }
 
-        // Update speed
-        leftSpeed += leftAcceleration;
-        rightSpeed += rightAcceleration;
+        // Calculate linear and angular velocities
+        double linearVelocity = (leftSpeed + rightSpeed) / 2.0;
+        double angularVelocity = (rightSpeed - leftSpeed) / wheelBase;
 
-        // Apply friction
-        leftSpeed *= friction;
-        rightSpeed *= friction;
-        
-        // TODO: check if this is correct
-        // Update position
-        double wheelBase = tankWidth; // Distance between the two wheels
-        double deltaTheta = (rightSpeed - leftSpeed) / wheelBase;
+        // Update position based on current angle
+        double deltaX = linearVelocity * Math.cos(position.getAngle().getRadians());
+        double deltaY = linearVelocity * Math.sin(position.getAngle().getRadians());
 
-        double distance = (leftSpeed + rightSpeed) / 2.0;
+        position.move(deltaX, deltaY);
 
-        position.getAngle().rotate(deltaTheta);
+        // Update orientation
+        position.getAngle().rotate(angularVelocity);
 
-        double dx = distance * position.getAngle().getCos();
-        double dy = distance * position.getAngle().getSin();
-
-        position.move(dx, dy);
+        System.out.println("Tank position: " + position.getX() + ", " + position.getY());
     }
 
     public void drawTire(Graphics g, DirectedPoint tire, Color color, double length, double width) {
@@ -156,7 +154,4 @@ public class Tank {
         drawTire(g, backLeft, Color.BLUE, secondaryTireLength, secondaryTireWidth);
         drawTire(g, backRight, Color.BLUE, secondaryTireLength, secondaryTireWidth);
     }
-
 }
-
-
