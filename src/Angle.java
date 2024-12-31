@@ -10,7 +10,7 @@ public class Angle {
         this.angle = angle;
     }
 
-    public double getAngle() {
+    public double getRadians() {
         return angle;
     }
 
@@ -36,7 +36,7 @@ public class Angle {
     }
 
     public void rotate(Angle other) {
-        this.angle = normalize(this.angle + other.getAngle());
+        this.angle = normalize(this.angle + other.getRadians());
     }
 
     public Angle copy() {

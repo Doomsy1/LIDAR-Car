@@ -67,11 +67,11 @@ public class Tank {
         this.tankLength = 150;
         this.tankWidth = 50;
 
-        this.driveTireLength = 10;
-        this.driveTireWidth = 5;
+        this.driveTireLength = 20;
+        this.driveTireWidth = 8;
         
-        this.secondaryTireLength = 10;
-        this.secondaryTireWidth = 5;
+        this.secondaryTireLength = 16;
+        this.secondaryTireWidth = 6;
     }
 
     public DirectedPoint getPosition() {
@@ -121,24 +121,28 @@ public class Tank {
         position.move(speed);
     }
 
-    public void drawTire(Graphics g, DirectedPoint tire, Color color) {
+    public void drawTire(Graphics g, DirectedPoint tire, Color color, boolean isDriveTire) {
         g.setColor(color);
         Angle angle = tire.getAngle();
         int[] xPoints = new int[4];
         int[] yPoints = new int[4];
 
+        // Use appropriate tire dimensions based on type
+        double tireLength = isDriveTire ? driveTireLength : secondaryTireLength;
+        double tireWidth = isDriveTire ? driveTireWidth : secondaryTireWidth;
+
         // Calculate the points of the tire
-        xPoints[0] = (int) (tire.getX() - (driveTireLength / 2) * angle.getCos() - (driveTireWidth / 2) * angle.getSin());
-        yPoints[0] = (int) (tire.getY() - (driveTireLength / 2) * angle.getSin() + (driveTireWidth / 2) * angle.getCos());
+        xPoints[0] = (int) (tire.getX() - (tireLength / 2) * angle.getCos() - (tireWidth / 2) * angle.getSin());
+        yPoints[0] = (int) (tire.getY() - (tireLength / 2) * angle.getSin() + (tireWidth / 2) * angle.getCos());
 
-        xPoints[1] = (int) (tire.getX() + (driveTireLength / 2) * angle.getCos() - (driveTireWidth / 2) * angle.getSin());
-        yPoints[1] = (int) (tire.getY() + (driveTireLength / 2) * angle.getSin() + (driveTireWidth / 2) * angle.getCos());
+        xPoints[1] = (int) (tire.getX() + (tireLength / 2) * angle.getCos() - (tireWidth / 2) * angle.getSin());
+        yPoints[1] = (int) (tire.getY() + (tireLength / 2) * angle.getSin() + (tireWidth / 2) * angle.getCos());
 
-        xPoints[2] = (int) (tire.getX() + (driveTireLength / 2) * angle.getCos() + (driveTireWidth / 2) * angle.getSin());
-        yPoints[2] = (int) (tire.getY() + (driveTireLength / 2) * angle.getSin() - (driveTireWidth / 2) * angle.getCos());
+        xPoints[2] = (int) (tire.getX() + (tireLength / 2) * angle.getCos() + (tireWidth / 2) * angle.getSin());
+        yPoints[2] = (int) (tire.getY() + (tireLength / 2) * angle.getSin() - (tireWidth / 2) * angle.getCos());
 
-        xPoints[3] = (int) (tire.getX() - (driveTireLength / 2) * angle.getCos() + (driveTireWidth / 2) * angle.getSin());
-        yPoints[3] = (int) (tire.getY() - (driveTireLength / 2) * angle.getSin() - (driveTireWidth / 2) * angle.getCos());
+        xPoints[3] = (int) (tire.getX() - (tireLength / 2) * angle.getCos() + (tireWidth / 2) * angle.getSin());
+        yPoints[3] = (int) (tire.getY() - (tireLength / 2) * angle.getSin() - (tireWidth / 2) * angle.getCos());
 
         g.fillPolygon(xPoints, yPoints, 4);
     }
@@ -153,8 +157,8 @@ public class Tank {
         DirectedPoint middleRight = position.copy();
         middleRight.move(-tankWidth / 2, perpendicularAngle);
 
-        drawTire(g, middleLeft, Color.RED);
-        drawTire(g, middleRight, Color.RED);
+        drawTire(g, middleLeft, Color.RED, true);
+        drawTire(g, middleRight, Color.RED, true);
 
         DirectedPoint frontLeft = middleLeft.copy();
         frontLeft.move(tankLength / 3);
@@ -162,8 +166,8 @@ public class Tank {
         DirectedPoint frontRight = middleRight.copy();
         frontRight.move(tankLength / 3);
 
-        drawTire(g, frontLeft, Color.GREEN);
-        drawTire(g, frontRight, Color.GREEN);
+        drawTire(g, frontLeft, Color.GREEN, false);
+        drawTire(g, frontRight, Color.GREEN, false);
 
         DirectedPoint backLeft = middleLeft.copy();
         backLeft.move(-tankLength / 3);
@@ -171,7 +175,7 @@ public class Tank {
         DirectedPoint backRight = middleRight.copy();
         backRight.move(-tankLength / 3);
 
-        drawTire(g, backLeft, Color.BLUE);
-        drawTire(g, backRight, Color.BLUE);
+        drawTire(g, backLeft, Color.BLUE, false);
+        drawTire(g, backRight, Color.BLUE, false);
     }
 }

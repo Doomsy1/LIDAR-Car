@@ -68,16 +68,20 @@ public class DirectedPoint {
         angle.rotate(degrees);
     }
 
+    public void rotate(Angle angle) {
+        this.angle.rotate(angle);
+    }
+
     public double distance(DirectedPoint other) {
         return point.distance(other.getPoint());
     }
 
     public DirectedPoint copy() {
-        return new DirectedPoint(point.copy(), angle.getAngle());
+        return new DirectedPoint(point.copy(), angle.getRadians());
     }
 
     @Override
     public int hashCode() {
-        return (int) (point.getX() + point.getY() + angle.getAngle());
+        return (int) (point.getX() + point.getY() + angle.getRadians());
     }
 }

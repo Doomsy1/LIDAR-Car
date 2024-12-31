@@ -8,11 +8,11 @@ import java.awt.*;
 
 public class Lidar {
     private final Angle bearing;
-    public final double resolution;
-    public final double minDistance;
-    public final double maxDistance;
-    public final double lidarRadius;
-    public final double noise;
+    private final double resolution;
+    private final double minDistance;
+    private final double maxDistance;
+    private final double lidarRadius;
+    private final double noise;
 
 
     public Lidar() {
@@ -21,7 +21,7 @@ public class Lidar {
         this.minDistance = 75;
         this.maxDistance = 200;
         this.lidarRadius = 10;
-        this.noise = 0;
+        this.noise = 1;
     }
 
     public Angle getBearing() {
@@ -36,38 +36,36 @@ public class Lidar {
         bearing.rotate(angle);
     }
 
-    public double randomizeReading(double reading) {
-        return reading + new java.util.Random().nextGaussian() * noise;
+    public Vector randomizeReading(double reading) {
+        return new Vector(bearing, reading + new java.util.Random().nextGaussian() * noise);
     }
 
-    public double read(int x, int y) {
-        Point start = new Point(x, y);
-        DirectedPoint beam = new DirectedPoint(x, y, bearing);
-        while (start.distance(beam.getX(), beam.getY()) < maxDistance) {
+    public Vector read(DirectedPoint lidarPosition) {
+        Point start = new Point(lidarPosition.getX(), lidarPosition.getY());
+
+        DirectedPoint beam = lidarPosition.copy();
+        beam.rotate(bearing.getRadians());
+        
+        while (start.distance(beam) < maxDistance) {
             beam.move(1);
-            if (beam.getX() < 0 || beam.getY() < 0 || beam.getX() > Mask.getWidth() || beam.getY() > Mask.getHeight()) {
-                if (start.distance(beam.getX(), beam.getY()) > minDistance) {
-                    return randomizeReading(start.distance(beam.getX(), beam.getY()));
+            if (!World.isAir((int) beam.getX(), (int) beam.getY())) {
+                if (start.distance(beam) > minDistance) {
+                    return randomizeReading(start.distance(beam));
                 }
-                return -1;
-            }
-            if (!Mask.clear((int) beam.getX(), (int) beam.getY())) {
-                if (start.distance(beam.getX(), beam.getY()) > minDistance) {
-                    return randomizeReading(start.distance(beam.getX(), beam.getY()));
-                }
-                return -1;
+                return null;
             }
         }
-        return -1;
+        return null;
     }
 
-    public void draw(Graphics g, int x, int y) {
+    public void draw(Graphics g, DirectedPoint lidarPosition) {
         g.setColor(new Color(10, 10, 10, 32));
-        g.drawOval((int) (x - lidarRadius / 2), (int) (y - lidarRadius / 2), (int) lidarRadius, (int) lidarRadius);
+        g.drawOval((int) (lidarPosition.getX() - lidarRadius / 2), (int) (lidarPosition.getY() - lidarRadius / 2), (int) lidarRadius, (int) lidarRadius);
 
         // Draw where the lidar is pointing
-        DirectedPoint sensor = new DirectedPoint(x, y, bearing);
-        sensor.move(maxDistance, bearing);
-        g.drawLine((int) x, (int) y, (int) sensor.getX(), (int) sensor.getY());
+        DirectedPoint sensor = lidarPosition.copy();
+        sensor.rotate(bearing);
+        sensor.move(maxDistance);
+        g.drawLine((int) lidarPosition.getX(), (int) lidarPosition.getY(), (int) sensor.getX(), (int) sensor.getY());
     }
 }
