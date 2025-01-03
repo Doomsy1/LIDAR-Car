@@ -1,7 +1,7 @@
 /*
  * LiCar.java
  * Ario Barin Ostovary & Kevin Dang
- * 
+ * Class combining the tank and lidar - uses particlefilter to create a map of the world
  */
 
 import java.awt.Color;
@@ -11,41 +11,50 @@ import java.util.ArrayList;
 public class LiCar {
     private final Lidar lidar;
     private final Tank tank;
-    private final int lidarScansPerFrame;
-    private final ArrayList<Point> lidarReadings;
+    private final int lidarScansPerFrame = 50;
+    private final ArrayList<Vector> lidarReadings;
 
-    public LiCar(int x, int y) {
-        tank = new Tank(x, y);
+    private final ParticleFilter particleFilter;
+    private final int numParticles = 2;
+
+    public LiCar(int x, int y, double angle,
+            int moveForward, int moveBackward,
+            int rotateAntiClockwise, int rotateClockwise) {
+        tank = new Tank(x, y, angle, moveForward, moveBackward, rotateAntiClockwise, rotateClockwise);
         lidar = new Lidar();
-        lidarScansPerFrame = 50;
         lidarReadings = new ArrayList<>();
+
+        particleFilter = new ParticleFilter(numParticles);
+    }
+
+    public DirectedPoint getActualPosition() {
+        return tank.getPosition();
     }
 
     public void update(boolean[] keysPressed) {
         tank.update(keysPressed);
 
+        double speed = tank.getSpeed();
+        double angle = tank.getRotationSpeed();
 
-        DirectedPoint lidarPosition = tank.getPosition();
+        particleFilter.predict(speed, angle);
+
         lidarReadings.clear();
 
+        // Scan lidar
         for (int i = 0; i < lidarScansPerFrame; i++) {
             lidar.update();
-            Vector reading = lidar.read(lidarPosition);
+            Vector reading = lidar.read(tank.getPosition());
             if (reading != null) {
-                DirectedPoint p = lidarPosition.copy();
-                p.rotate(reading.getDirection());
-                p.move(reading.getMagnitude());
-                lidarReadings.add(p.getPoint());
+                lidarReadings.add(reading);
             }
         }
-    }
 
-    public void setMovementKeys(int moveForward, int moveBackward, int rotateAntiClockwise, int rotateClockwise) {
-        tank.setMovementKeys(moveForward, moveBackward, rotateAntiClockwise, rotateClockwise);
-    }
+        particleFilter.updateWeights(lidarReadings);
 
-    public DirectedPoint getPosition() {
-        return tank.getPosition();
+        particleFilter.resample();
+
+        particleFilter.updateGrids(lidarReadings);
     }
 
     private void drawCar(Graphics g) {
@@ -57,8 +66,11 @@ public class LiCar {
     private void drawRays(Graphics g) {
         DirectedPoint tankPosition = tank.getPosition();
         g.setColor(Color.RED);
-        for (Point p : lidarReadings) {
-            g.drawLine((int) tankPosition.getX(), (int) tankPosition.getY(), (int) p.getX(), (int) p.getY());
+        for (Vector v : lidarReadings) {
+            DirectedPoint rayEnd = tankPosition.copy();
+            rayEnd.rotate(v.getDirection());
+            rayEnd.move(v.getMagnitude());
+            g.drawLine((int) tankPosition.getX(), (int) tankPosition.getY(), (int) rayEnd.getX(), (int) rayEnd.getY());
         }
     }
 
@@ -66,8 +78,11 @@ public class LiCar {
         DirectedPoint tankPosition = tank.getPosition();
         int radius = 3;
         g.setColor(Color.GREEN);
-        for (Point p : lidarReadings) {
-            g.drawOval((int) p.getX() - radius, (int) p.getY() - radius, radius * 2, radius * 2);
+        for (Vector v : lidarReadings) {
+            DirectedPoint rayEnd = tankPosition.copy();
+            rayEnd.rotate(v.getDirection());
+            rayEnd.move(v.getMagnitude());
+            g.drawOval((int) rayEnd.getX() - radius, (int) rayEnd.getY() - radius, radius * 2, radius * 2);
         }
     }
 
@@ -80,5 +95,9 @@ public class LiCar {
         if (drawReadings) {
             drawReadings(g);
         }
+    }
+
+    public void drawOccupancyGrid(Graphics g) {
+        particleFilter.draw(g);
     }
 }

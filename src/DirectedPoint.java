@@ -1,28 +1,29 @@
 /*
  * DirectedPoint.java
  * Ario Barin Ostovary
- * 
+ * Class for a point with an angle
  */
+
 public class DirectedPoint {
-    private final Point point;
+    private final MyPoint point;
     private final Angle angle;
 
     public DirectedPoint(double x, double y, double angle) {
-        this.point = new Point(x, y);
+        this.point = new MyPoint(x, y);
         this.angle = new Angle(angle);
     }
 
-    public DirectedPoint(Point point, double angle) {
+    public DirectedPoint(MyPoint point, double angle) {
         this.point = point;
         this.angle = new Angle(angle);
     }
 
     public DirectedPoint(double x, double y, Angle angle) {
-        this.point = new Point(x, y);
+        this.point = new MyPoint(x, y);
         this.angle = angle;
     }
 
-    public DirectedPoint(Point point, Angle angle) {
+    public DirectedPoint(MyPoint point, Angle angle) {
         this.point = point;
         this.angle = angle;
     }
@@ -35,7 +36,7 @@ public class DirectedPoint {
         return point.getY();
     }
 
-    public Point getPoint() {
+    public MyPoint getPoint() {
         return point.copy();
     }
 
@@ -77,7 +78,7 @@ public class DirectedPoint {
     }
 
     public DirectedPoint copy() {
-        return new DirectedPoint(point.copy(), angle.getRadians());
+        return new DirectedPoint(point.copy(), angle.copy());
     }
 
     @Override

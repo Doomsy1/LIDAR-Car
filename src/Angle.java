@@ -1,8 +1,9 @@
 /*
  * Angle.java
  * Ario Barin Ostovary
- * 
+ * Angle class in radians
  */
+
 public class Angle {
     private double angle; // in radians
 

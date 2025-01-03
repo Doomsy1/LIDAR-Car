@@ -1,14 +1,14 @@
 /*  
  * Point.java
  * Ario Barin Ostovary
- * 
+ * Class for a point in 2D space
  */
 
-public class Point {
+public class MyPoint {
     private double x;
     private double y;
 
-    public Point(double x, double y) {
+    public MyPoint(double x, double y) {
         this.x = x;
         this.y = y;
     }
@@ -40,7 +40,7 @@ public class Point {
         y += dy;
     }
 
-    public double distance(Point p) {
+    public double distance(MyPoint p) {
         return Math.sqrt(Math.pow(p.getX() - x, 2) + Math.pow(p.getY() - y, 2));
     }
 
@@ -52,7 +52,7 @@ public class Point {
         return Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2));
     }
 
-    public Point copy() {
-        return new Point(x, y);
+    public MyPoint copy() {
+        return new MyPoint(x, y);
     }
 }

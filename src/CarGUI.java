@@ -1,7 +1,7 @@
 /* 
  * CarGUI.java
  * Ario Barin Ostovary & Kevin Dang
- * 
+ * Main class for the Car GUI
  */
 
 import javax.swing.*;

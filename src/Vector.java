@@ -1,6 +1,7 @@
 /*
  * Vector.java
  * Ario Barin Ostovary
+ * Class for a vector in 2D space (direction and magnitude)
  */
 
 public class Vector {
