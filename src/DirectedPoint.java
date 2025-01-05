@@ -44,17 +44,8 @@ public class DirectedPoint {
         return angle.copy();
     }
 
-    public void setAngle(double angle) {
-        this.angle.setAngle(angle);
-    }
-
     public void move(double distance) {
         point.move(distance, angle);
-    }
-
-    public void setXY(double x, double y) {
-        point.setX(x);
-        point.setY(y);
     }
 
     public void move(double dx, double dy) {
@@ -84,5 +75,10 @@ public class DirectedPoint {
     @Override
     public int hashCode() {
         return (int) (point.getX() + point.getY() + angle.getRadians());
+    }
+
+    @Override
+    public String toString() {
+        return "(Point: " + point + ", Angle: " + angle + ")";
     }
 }

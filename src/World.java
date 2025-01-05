@@ -45,7 +45,7 @@ public class World {
     private final LiCar licar;
 
     public World() {
-        this.licar = new LiCar(WORLD_WIDTH / 5, WORLD_HEIGHT / 5, 0,
+        this.licar = new LiCar(WORLD_WIDTH * 1/5, WORLD_HEIGHT * 1/4, 0,
                 KeyEvent.VK_W, KeyEvent.VK_S,
                 KeyEvent.VK_A, KeyEvent.VK_D);
     }
@@ -141,7 +141,7 @@ public class World {
                     Color.WHITE,
                     graphics -> {
                         drawBackground(graphics);
-                        licar.draw(graphics, true, true);
+                        licar.draw(graphics, false, true);
                     });
         } finally {
             g2d.dispose();
@@ -172,7 +172,7 @@ public class World {
                     Color.WHITE,
                     graphics -> {
                         drawBackground(graphics);
-                        licar.draw(graphics, true, true);
+                        licar.draw(graphics, false, true);
                     });
         } finally {
             g2d.dispose();

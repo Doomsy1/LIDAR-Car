@@ -23,10 +23,6 @@ public class Angle {
         return Math.sin(angle);
     }
 
-    public void setAngle(double angle) {
-        this.angle = angle;
-    }
-
     private double normalize(double angle) {
         // Normalize the angle to be between 0 and 2*pi
         return (angle + Math.PI * 2) % (Math.PI * 2);
@@ -46,6 +42,6 @@ public class Angle {
 
     @Override
     public String toString() {
-        return String.format("%.2f", angle);
+        return "Radians: " + angle;
     }
 }

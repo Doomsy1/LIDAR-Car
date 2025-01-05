@@ -12,7 +12,7 @@ import javax.swing.Timer;
 
 public class CarGUIPanel extends JPanel implements KeyListener, ActionListener, MouseListener, MouseMotionListener {
     public static final int BASE_WIDTH = 1200, BASE_HEIGHT = 800;
-    private static final int FPS = 60;
+    private static final int FPS = 100;
 
     // Array of keys pressed
     private final boolean[] keysPressed;
@@ -20,6 +20,10 @@ public class CarGUIPanel extends JPanel implements KeyListener, ActionListener, 
     private final Timer timer;
 
     private final World world;
+
+    private int currentFPS = 0;
+    private int frameCount = 0;
+    private long lastFPSCheck = 0;
 
     public CarGUIPanel() {
         keysPressed = new boolean[KeyEvent.KEY_LAST + 1];
@@ -152,10 +156,24 @@ public class CarGUIPanel extends JPanel implements KeyListener, ActionListener, 
         g2dOccupancy.dispose();
 
         g.drawImage(occupancyView, occupancyX, occupancyY, this);
+
+        // Draw FPS counter
+        g.setColor(Color.GREEN);
+        g.setFont(new Font("Arial", Font.BOLD, 16));
+        g.drawString("FPS: " + currentFPS, 10, 20);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        frameCount++;
+        long currentTime = System.currentTimeMillis();
+        
+        if (currentTime - lastFPSCheck >= 1000) {  // Update FPS every second
+            currentFPS = frameCount;
+            frameCount = 0;
+            lastFPSCheck = currentTime;
+        }
+        
         step();
         repaint();
     }

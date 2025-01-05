@@ -5,6 +5,8 @@
  */
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Lidar {
     private final Angle bearing;
@@ -12,14 +14,15 @@ public class Lidar {
     // tick = 1.8 degrees
     private static final double TICK = Math.PI / 180 * 1.8;
 
-    private final double resolution = 50;
+    private static final double TICK_PER_SCAN = 7;
+    private static final int SCANS_PER_FRAME = 50;
 
     public static final double MIN_DISTANCE = 1;
-    public static final double MAX_DISTANCE = 300;
+    public static final double MAX_DISTANCE = 250;
 
     private final double lidarRadius = 10;
-    private final double readingNoise = 1.5;
-    private final double bearingNoise = 0.005;
+
+    public static final double READING_NOISE = 5.0;
 
     public Lidar() {
         bearing = new Angle(0);
@@ -30,33 +33,38 @@ public class Lidar {
     }
 
     public void update() {
-        bearing.rotate(Math.PI * 2 / resolution + Util.gaussianNoise(bearingNoise));
-        // bearing.rotate(Math.PI * 2 / resolution + 0.01);
-        // bearing.rotate(Math.PI * 2 / resolution);
+        bearing.rotate(TICK * TICK_PER_SCAN);
     }
 
-    public Vector randomizeReading(double reading) {
-        return new Vector(bearing.copy(), reading + Util.gaussianNoise(readingNoise));
+    public MyVector randomizeReading(double reading) {
+        return new MyVector(bearing.copy(), reading + Util.randomGaussian(READING_NOISE));
     }
 
-    public Vector read(DirectedPoint lidarPosition) {
+    public MyVector read(DirectedPoint lidarPosition) {
         DirectedPoint beam = lidarPosition.copy();
         beam.rotate(bearing); // Make the beam face in the direction of the lidar
+        beam.move(MAX_DISTANCE);
 
-        double step = 0.5;
-        double distance = 0;
+        MyPoint start = lidarPosition.getPoint();
+        MyPoint end = beam.getPoint();
 
-        while (distance < MAX_DISTANCE) {
-            distance += step;
-            beam.move(step);
-            if (!World.isAir((int) beam.getX(), (int) beam.getY())) {
-                if (distance > MIN_DISTANCE) {
-                    return randomizeReading(distance);
-                }
-                return new Vector(bearing.copy(), MIN_DISTANCE);
+        List<MyPoint> points = RayCaster.getCellsAlongRay(start, end);
+
+        for (MyPoint point : points) {
+            if (!World.isAir((int) point.getX(), (int) point.getY())) {
+                return randomizeReading(point.distance(lidarPosition));
             }
         }
-        return new Vector(bearing.copy(), MAX_DISTANCE);
+        return new MyVector(bearing.copy(), MAX_DISTANCE);
+    }
+
+    public List<MyVector> scan(DirectedPoint lidarPosition) {
+        List<MyVector> readings = new ArrayList<>();
+        for (int i = 0; i < SCANS_PER_FRAME; i++) {
+            readings.add(read(lidarPosition));
+            update();
+        }
+        return readings;
     }
 
     public void draw(Graphics g, DirectedPoint lidarPosition) {

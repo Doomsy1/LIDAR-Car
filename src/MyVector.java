@@ -4,16 +4,16 @@
  * Class for a vector in 2D space (direction and magnitude)
  */
 
-public class Vector {
+public class MyVector {
     private Angle direction;
     private double magnitude;
 
-    public Vector(Angle direction, double magnitude) {
+    public MyVector(Angle direction, double magnitude) {
         this.direction = direction;
         this.magnitude = magnitude;
     }
 
-    public Vector(double direction, double magnitude) {
+    public MyVector(double direction, double magnitude) {
         this.direction = new Angle(direction);
         this.magnitude = magnitude;
     }
@@ -50,17 +50,22 @@ public class Vector {
         return direction.getSin() * magnitude;
     }
 
-    public Vector add(Vector other) {
+    public MyVector add(MyVector other) {
         double x = direction.getCos() * magnitude + other.getDirection().getCos() * other.getMagnitude();
         double y = direction.getSin() * magnitude + other.getDirection().getSin() * other.getMagnitude();
-        return new Vector(new Angle(Math.atan2(y, x)), Math.sqrt(x * x + y * y));
+        return new MyVector(new Angle(Math.atan2(y, x)), Math.sqrt(x * x + y * y));
     }
 
-    public Vector subtract(Vector other) {
+    public MyVector subtract(MyVector other) {
         return add(other.scale(-1));
     }
 
-    public Vector scale(double scalar) {
-        return new Vector(direction, magnitude * scalar);
+    public MyVector scale(double scalar) {
+        return new MyVector(direction, magnitude * scalar);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Vector(mag=%.2f, dir=%.2f)", getMagnitude(), getDirection().getRadians());
     }
 }

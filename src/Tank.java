@@ -19,7 +19,7 @@ public class Tank {
     public final int rotateClockwise;
 
     // Movement Constants
-    private final double MAX_SPEED = 5;
+    private final double MAX_SPEED = 2;
     private final double MAX_ACCELERATION = 1;
     private final double FRICTION = MAX_SPEED / (MAX_SPEED + MAX_ACCELERATION);
 
@@ -29,8 +29,8 @@ public class Tank {
 
     // Rotation Constants
     private final double MAX_ROTATION_SPEED = Math.toRadians(3);
-    private final double MAX_ANGUALR_ACCELERATION = Math.toRadians(0.7);
-    private final double ROTATION_FRICTION = MAX_ROTATION_SPEED / (MAX_ROTATION_SPEED + MAX_ANGUALR_ACCELERATION);
+    private final double MAX_ANGULAR_ACCELERATION = Math.toRadians(0.7);
+    private final double ROTATION_FRICTION = MAX_ROTATION_SPEED / (MAX_ROTATION_SPEED + MAX_ANGULAR_ACCELERATION);
 
     // Rotation variables
     private double rotationSpeed;
@@ -47,8 +47,8 @@ public class Tank {
     private final double SECONDARY_TIRE_WIDTH = 4;
 
     // Noise constants
-    private final double SPEED_NOISE = 0.05;
-    private final double ROTATION_NOISE = 0.0005;
+    private final double SPEED_NOISE = 0.0;
+    private final double ROTATION_NOISE = 0.0;
 
     public Tank(int x, int y, double angle, int moveForward, int moveBackward, int rotateAntiClockwise,
             int rotateClockwise) {
@@ -73,11 +73,13 @@ public class Tank {
     }
 
     public double getSpeed() {
-        return speed + Util.gaussianNoise(SPEED_NOISE);
+        return speed + Util.randomGaussian(SPEED_NOISE);
+        // return -speed;
     }
 
     public double getRotationSpeed() {
-        return rotationSpeed + Util.gaussianNoise(ROTATION_NOISE);
+        return rotationSpeed + Util.randomGaussian(ROTATION_NOISE);
+        // return -rotationSpeed;
     }
 
     public void update(boolean[] keys) {
@@ -98,9 +100,9 @@ public class Tank {
         rotationAcceleration = 0;
         if (keys[rotateAntiClockwise] && keys[rotateClockwise]) {
         } else if (keys[rotateAntiClockwise]) {
-            rotationAcceleration = -MAX_ANGUALR_ACCELERATION;
+            rotationAcceleration = -MAX_ANGULAR_ACCELERATION;
         } else if (keys[rotateClockwise]) {
-            rotationAcceleration = MAX_ANGUALR_ACCELERATION;
+            rotationAcceleration = MAX_ANGULAR_ACCELERATION;
         }
 
         // Update rotation speed based on rotation acceleration

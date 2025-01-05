@@ -6,9 +6,12 @@
  */
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+import javax.imageio.ImageIO;
 
 public class OccupancyGrid {
     private double[][] grid;
@@ -24,15 +27,18 @@ public class OccupancyGrid {
     private static final double GROW_FACTOR = 1.1;
 
     // log odds
-    private static final double DEFAULT_LOG_ODDS = Math.log(0.5 / (1 - 0.5));
-    private static final double LOG_ODDS_OCCUPIED = Math.log(0.99 / (1 - 0.99));
-    private static final double LOG_ODDS_FREE = Math.log(0.01 / (1 - 0.01));
+    private static final double DEFAULT_LOG_ODDS = Util.probToLogit(0.5);
+    private static final double LOG_ODDS_OCCUPIED = Util.probToLogit(0.75);
+    private static final double LOG_ODDS_FREE = Util.probToLogit(0.35);
 
     // max and min log odds
-    private static final double MAX_LOG_ODDS = Math.log(0.95 / (1 - 0.95));
-    private static final double MIN_LOG_ODDS = Math.log(0.05 / (1 - 0.05));
+    private static final double MAX_LOG_ODDS = Util.probToLogit(0.95);
+    private static final double MIN_LOG_ODDS = Util.probToLogit(0.05);
 
-    private BufferedImage occupancyImage;
+    private static final double OCCUPIED_THRESHOLD = 0.7;
+    private static final double FREE_THRESHOLD = 0.3;
+
+    private BufferedImage image;
 
     public OccupancyGrid(int width, int height, int cellSize) {
         this.width = width;
@@ -48,33 +54,100 @@ public class OccupancyGrid {
         this.centerX = width / 2;
         this.centerY = height / 2;
 
-        // create image
-        this.occupancyImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        updateOccupancyImage();
+        this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        updateImage();
     }
 
-    public int getWorldWidth() {
-        return width * cellSize;
+    public OccupancyGrid(String filename, Color occupiedColor, Color freeColor, int cellSize) {
+        try {
+            this.image = ImageIO.read(new File(filename));
+
+            int imageWidth = image.getWidth();
+            int imageHeight = image.getHeight();
+            this.width = (int) Math.ceil(imageWidth / cellSize);
+            this.height = (int) Math.ceil(imageHeight / cellSize);
+            this.cellSize = cellSize;
+
+            this.grid = filledGrid(width, height);
+            this.centerX = width / 2;
+            this.centerY = height / 2;
+
+            // Process each cell in the grid
+            for (int gridX = 0; gridX < width; gridX++) {
+                for (int gridY = 0; gridY < height; gridY++) {
+                    // Calculate the corresponding pixel region in the source image
+                    int startX = gridX * cellSize;
+                    int startY = gridY * cellSize;
+                    int endX = Math.min(startX + cellSize, imageWidth);
+                    int endY = Math.min(startY + cellSize, imageHeight);
+
+                    int occupiedPixels = 0;
+                    int totalPixels = 0;
+
+                    // Check each pixel in the cell region
+                    for (int x = startX; x < endX; x++) {
+                        for (int y = startY; y < endY; y++) {
+                            Color pixelColor = new Color(image.getRGB(x, y));
+                            if (colorMatch(pixelColor, occupiedColor)) {
+                                occupiedPixels++;
+                            } else if (!colorMatch(pixelColor, freeColor)) {
+                                // If pixel is neither occupied nor free color, treat as occupied
+                                occupiedPixels++;
+                            }
+                            totalPixels++;
+                        }
+                    }
+
+                    // Calculate probability of occupation for this cell
+                    double probability = (double) occupiedPixels / totalPixels;
+                    grid[gridX][gridY] = Util.probToLogit(Math.max(0.01, Math.min(0.99, probability)));
+                }
+            }
+
+            updateImage();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load image: " + filename, e);
+        }
     }
 
-    public int getWorldHeight() {
-        return height * cellSize;
-    }
+    public double[][] getGrid() { return grid; }
 
-    public int getCenterX() {
-        return centerX;
-    }
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
+    public int getCellSize() { return cellSize; }
 
-    public int getCenterY() {
-        return centerY;
-    }
+    public int getCenterX() { return centerX; }
+    public int getCenterY() { return centerY; }
 
-    private int worldToGridX(double x) {
+    public int worldToGridX(double x) {
         return (int) Math.round(x / cellSize) + centerX;
     }
-
-    private int worldToGridY(double y) {
+    public int worldToGridY(double y) {
         return (int) Math.round(y / cellSize) + centerY;
+    }
+
+    public double gridToWorldX(double x) {
+        return (x - centerX) * cellSize;
+    }
+
+    public double gridToWorldY(double y) {
+        return (y - centerY) * cellSize;
+    }
+
+    public boolean isOccupied(double x, double y) {
+        return isOccupiedCell(worldToGridX(x), worldToGridY(y));
+    }
+    
+    public boolean isOccupiedCell(int x, int y) {
+        return grid[x][y] > LOG_ODDS_OCCUPIED;
+    }
+
+    public boolean isFree(double x, double y) {
+        return isFreeCell(worldToGridX(x), worldToGridY(y));
+    }
+
+    public boolean isFreeCell(int x, int y) {
+        return grid[x][y] < LOG_ODDS_FREE;
     }
 
     // helper function
@@ -85,11 +158,8 @@ public class OccupancyGrid {
         }
         return filledGrid;
     }
-
-    private void resizeGrid(int dx, int dy) {
-        int x = worldToGridX(dx);
-        int y = worldToGridY(dy);
-
+    
+    private void resizeGrid(int cellX, int cellY) {
         boolean resized = false;
 
         int newWidth = width;
@@ -97,25 +167,27 @@ public class OccupancyGrid {
         int newCenterX = centerX;
         int newCenterY = centerY;
 
-        int newX = x;
-        int newY = y;
+        int newX = cellX;
+        int newY = cellY;
 
-        // check if the new position is within the grid (must resize if not)
-        if (newX < 0 || newX >= newWidth) {
-            newWidth = (int) (width * GROW_FACTOR);
+        // Modified to handle double GROW_FACTOR
+        while (newX < 0 || newX >= newWidth) {
             if (newX < 0) {
-                newCenterX += (int) (width * GROW_FACTOR - width);
+                int growAmount = (int)(newWidth * (GROW_FACTOR - 1));
+                newCenterX += growAmount;
+                newX = cellX + (newCenterX - centerX);
             }
-            newX = (int) Math.round(newX / cellSize) + newCenterX;
+            newWidth = (int)(newWidth * GROW_FACTOR);
             resized = true;
         }
 
-        if (newY < 0 || newY >= newHeight) {
-            newHeight = (int) (height * GROW_FACTOR);
+        while (newY < 0 || newY >= newHeight) {
             if (newY < 0) {
-                newCenterY += (int) (height * GROW_FACTOR - height);
+                int growAmount = (int)(newHeight * (GROW_FACTOR - 1));
+                newCenterY += growAmount;
+                newY = cellY + (newCenterY - centerY);
             }
-            newY = (int) Math.round(newY / cellSize) + newCenterY;
+            newHeight = (int)(newHeight * GROW_FACTOR);
             resized = true;
         }
 
@@ -128,7 +200,11 @@ public class OccupancyGrid {
 
             // copy the previous grid into the new grid
             for (int i = 0; i < width; i++) {
-                System.arraycopy(grid[i], 0, newGrid[i + xOffset], yOffset, height);
+                for (int j = 0; j < height; j++) {
+                    int x = i + xOffset;
+                    int y = j + yOffset;
+                    newGrid[x][y] = grid[i][j];
+                }
             }
 
             // update grid and dimensions
@@ -138,9 +214,8 @@ public class OccupancyGrid {
             centerX = newCenterX;
             centerY = newCenterY;
 
-            // update image
-            this.occupancyImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            updateOccupancyImage();
+            image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            updateImage();
         }
     }
 
@@ -148,49 +223,90 @@ public class OccupancyGrid {
         increaseProbability((int) Math.round(x), (int) Math.round(y));
     }
 
+    public void decreaseProbability(int dx, int dy) {
+        decreaseCellProbability(worldToGridX(dx), worldToGridY(dy));
+    }
+
     public void increaseProbability(int dx, int dy) {
-        resizeGrid(dx, dy);
-
-        int x = worldToGridX(dx);
-        int y = worldToGridY(dy);
-
-        // increase probability
-        grid[x][y] += LOG_ODDS_OCCUPIED;
-        grid[x][y] = Math.min(grid[x][y], MAX_LOG_ODDS);
-
-        // update image
-        updateCellInImage(x, y);
+        increaseCellProbability(worldToGridX(dx), worldToGridY(dy));
     }
 
     public void decreaseProbability(double x, double y) {
         decreaseProbability((int) Math.round(x), (int) Math.round(y));
     }
 
-    public void decreaseProbability(int dx, int dy) {
-        resizeGrid(dx, dy);
+    public void increaseCellProbability(int x, int y) {
+        int oldCenterX = centerX;
+        int oldCenterY = centerY;
+        resizeGrid(x, y);
 
-        int x = worldToGridX(dx);
-        int y = worldToGridY(dy);
+        int newCenterX = centerX;
+        int newCenterY = centerY;
 
-        // reduce probability
-        grid[x][y] += LOG_ODDS_FREE;
-        grid[x][y] = Math.max(grid[x][y], MIN_LOG_ODDS);
+        x += (newCenterX - oldCenterX);
+        y += (newCenterY - oldCenterY);
 
-        // update image
+        grid[x][y] += LOG_ODDS_OCCUPIED;
+        grid[x][y] = Math.min(grid[x][y], MAX_LOG_ODDS);
+
         updateCellInImage(x, y);
     }
 
-    private double getProbability(double logOdds) {
-        return 1.0 - 1.0 / (1.0 + Math.exp(logOdds));
+    public void decreaseCellProbability(int x, int y) {
+        int oldCenterX = centerX;
+        int oldCenterY = centerY;
+        resizeGrid(x, y);
+
+        int newCenterX = centerX;
+        int newCenterY = centerY;
+
+        x += (newCenterX - oldCenterX);
+        y += (newCenterY - oldCenterY);
+
+        grid[x][y] += LOG_ODDS_FREE;
+        grid[x][y] = Math.max(grid[x][y], MIN_LOG_ODDS);
+
+        updateCellInImage(x, y);
+    }
+
+    public void updateGrid(DirectedPoint pose, List<MyVector> lidarReadings) {
+        for (MyVector reading : lidarReadings) {
+            DirectedPoint rayEnd = pose.copy();
+            rayEnd.rotate(reading.getDirection());
+            rayEnd.move(reading.getMagnitude());
+
+            int startX = worldToGridX(pose.getX());
+            int startY = worldToGridY(pose.getY());
+            int endX = worldToGridX(rayEnd.getX());
+            int endY = worldToGridY(rayEnd.getY());
+
+            List<MyPoint> freeCells = RayCaster.getCellsAlongRay(startX, startY, endX, endY);
+            
+            // remove the last point since it will be occupied
+            if (!freeCells.isEmpty() && reading.getMagnitude() < Lidar.MAX_DISTANCE) {
+                freeCells.remove(freeCells.size() - 1);
+            }
+            
+            for (MyPoint cell : freeCells) {
+                decreaseCellProbability((int) cell.getX(), (int) cell.getY());
+
+                // make the cell red
+                // image.setRGB((int) cell.getX(), (int) cell.getY(), Color.RED.getRGB());
+            }
+
+            if (reading.getMagnitude() < Lidar.MAX_DISTANCE) {
+                increaseCellProbability(endX, endY);
+            }
+        }
     }
 
     public double getProbability(int dx, int dy) {
-        resizeGrid(dx, dy);
-
         int x = worldToGridX(dx);
         int y = worldToGridY(dy);
 
-        return getProbability(grid[x][y]);
+        resizeGrid(x, y);
+
+        return Util.logitToProb(grid[x][y]);
     }
 
     public void clearGrid() {
@@ -198,45 +314,9 @@ public class OccupancyGrid {
     }
 
     public void saveGrid(String filename) {
-        // TODO
     }
 
     public void loadGrid(String filename) {
-        // TODO
-    }
-
-    public void saveImage(String filename) {
-        // TODO
-    }
-
-    private Color getColor(int x, int y) {
-        double prob = getProbability(grid[x][y]);
-        if (prob > 0.7) {
-            return Color.BLACK; // Occupied
-        } else if (prob < 0.3) {
-            return Color.WHITE; // Free
-        } else {
-            return new Color((int) (255 * prob), (int) (255 * prob), (int) (255 * prob));
-        }
-    }
-
-    private void updateOccupancyImage() {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                occupancyImage.setRGB(x, y, getColor(x, y).getRGB());
-            }
-        }
-    }
-
-    private void updateCellInImage(int x, int y) {
-        occupancyImage.setRGB(x, y, getColor(x, y).getRGB());
-    }
-
-    public void draw(Graphics g) {
-        int panelWidth = g.getClipBounds().width;
-        int panelHeight = g.getClipBounds().height;
-
-        g.drawImage(occupancyImage, 0, 0, panelWidth, panelHeight, null);
     }
 
     public OccupancyGrid copy() {
@@ -252,9 +332,40 @@ public class OccupancyGrid {
             System.arraycopy(this.grid[x], 0, copy.grid[x], 0, height);
         }
 
-        // Update the image to reflect the copied grid
-        copy.updateOccupancyImage();
-
         return copy;
+    }
+
+    private Color getColor(double probability) {
+        if (probability > OCCUPIED_THRESHOLD) {
+            return Color.BLACK; // Occupied
+        } else if (probability < FREE_THRESHOLD) {
+            return Color.WHITE; // Free
+        } else {
+            return new Color((int) (255 * probability), (int) (255 * probability), (int) (255 * probability));
+        }
+    }
+
+    private void updateCellInImage(int x, int y) {
+        double logOdds = grid[x][y];
+        double probability = Util.logitToProb(logOdds);
+        image.setRGB(x, y, getColor(probability).getRGB());
+    }
+
+    private void updateImage() {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                updateCellInImage(x, y);
+            }
+        }
+    }
+
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    private boolean colorMatch(Color c1, Color c2) {
+        return c1.getRed() == c2.getRed() && 
+               c1.getGreen() == c2.getGreen() && 
+               c1.getBlue() == c2.getBlue();
     }
 }

@@ -55,4 +55,9 @@ public class MyPoint {
     public MyPoint copy() {
         return new MyPoint(x, y);
     }
+
+    @Override
+    public String toString() {
+        return "(X: " + x + ", Y: " + y + ")";
+    }
 }
