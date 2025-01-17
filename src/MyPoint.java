@@ -29,7 +29,7 @@ public class MyPoint {
         this.y = y;
     }
 
-    public void move(double distance, Angle angle) {
+    public void move(double distance, MyAngle angle) {
         // Move the point by the given distance and angle
         x += distance * angle.getCos();
         y += distance * angle.getSin();
@@ -44,7 +44,7 @@ public class MyPoint {
         return Math.sqrt(Math.pow(p.getX() - x, 2) + Math.pow(p.getY() - y, 2));
     }
 
-    public double distance(DirectedPoint p) {
+    public double distance(MyDirectedPoint p) {
         return distance(p.getX(), p.getY());
     }
 

@@ -4,26 +4,26 @@
  * Class for a point with an angle
  */
 
-public class DirectedPoint {
+public class MyDirectedPoint {
     private final MyPoint point;
-    private final Angle angle;
+    private final MyAngle angle;
 
-    public DirectedPoint(double x, double y, double angle) {
+    public MyDirectedPoint(double x, double y, double angle) {
         this.point = new MyPoint(x, y);
-        this.angle = new Angle(angle);
+        this.angle = new MyAngle(angle);
     }
 
-    public DirectedPoint(MyPoint point, double angle) {
+    public MyDirectedPoint(MyPoint point, double angle) {
         this.point = point;
-        this.angle = new Angle(angle);
+        this.angle = new MyAngle(angle);
     }
 
-    public DirectedPoint(double x, double y, Angle angle) {
+    public MyDirectedPoint(double x, double y, MyAngle angle) {
         this.point = new MyPoint(x, y);
         this.angle = angle;
     }
 
-    public DirectedPoint(MyPoint point, Angle angle) {
+    public MyDirectedPoint(MyPoint point, MyAngle angle) {
         this.point = point;
         this.angle = angle;
     }
@@ -40,7 +40,7 @@ public class DirectedPoint {
         return point.copy();
     }
 
-    public Angle getAngle() {
+    public MyAngle getAngle() {
         return angle.copy();
     }
 
@@ -52,7 +52,7 @@ public class DirectedPoint {
         point.move(dx, dy);
     }
 
-    public void move(double distance, Angle angle) {
+    public void move(double distance, MyAngle angle) {
         point.move(distance, angle);
     }
 
@@ -60,16 +60,16 @@ public class DirectedPoint {
         angle.rotate(degrees);
     }
 
-    public void rotate(Angle angle) {
+    public void rotate(MyAngle angle) {
         this.angle.rotate(angle);
     }
 
-    public double distance(DirectedPoint other) {
+    public double distance(MyDirectedPoint other) {
         return point.distance(other.getPoint());
     }
 
-    public DirectedPoint copy() {
-        return new DirectedPoint(point.copy(), angle.copy());
+    public MyDirectedPoint copy() {
+        return new MyDirectedPoint(point.copy(), angle.copy());
     }
 
     @Override

@@ -5,20 +5,20 @@
  */
 
 public class MyVector {
-    private Angle direction;
+    private MyAngle direction;
     private double magnitude;
 
-    public MyVector(Angle direction, double magnitude) {
+    public MyVector(MyAngle direction, double magnitude) {
         this.direction = direction;
         this.magnitude = magnitude;
     }
 
     public MyVector(double direction, double magnitude) {
-        this.direction = new Angle(direction);
+        this.direction = new MyAngle(direction);
         this.magnitude = magnitude;
     }
 
-    public Angle getDirection() {
+    public MyAngle getDirection() {
         return direction;
     }
 
@@ -30,12 +30,12 @@ public class MyVector {
         return magnitude;
     }
 
-    public void setDirection(Angle direction) {
+    public void setDirection(MyAngle direction) {
         this.direction = direction;
     }
 
     public void setDirection(double direction) {
-        this.direction = new Angle(direction);
+        this.direction = new MyAngle(direction);
     }
 
     public void setMagnitude(double magnitude) {
@@ -53,7 +53,7 @@ public class MyVector {
     public MyVector add(MyVector other) {
         double x = direction.getCos() * magnitude + other.getDirection().getCos() * other.getMagnitude();
         double y = direction.getSin() * magnitude + other.getDirection().getSin() * other.getMagnitude();
-        return new MyVector(new Angle(Math.atan2(y, x)), Math.sqrt(x * x + y * y));
+        return new MyVector(new MyAngle(Math.atan2(y, x)), Math.sqrt(x * x + y * y));
     }
 
     public MyVector subtract(MyVector other) {

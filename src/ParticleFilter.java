@@ -19,24 +19,26 @@ public class ParticleFilter {
     private List<Particle> particles;
     private final OccupancyGrid occupancyGrid;
 
-    private static final int STARTING_WIDTH = 800/5;
-    private static final int STARTING_HEIGHT = 600/5;
+    private static final int RESOLUTION = 1;
+
+    private static final int STARTING_WIDTH = 800 / RESOLUTION;
+    private static final int STARTING_HEIGHT = 600 / RESOLUTION;
 
     private static final double INITIAL_POSITION_STDDEV = 50.0;
     private static final double INITIAL_BEARING_STDDEV = 0.0;
 
     private static final int NUM_PARTICLES_START = 20000;
-    private static final int NUM_PARTICLES_END = 250;
-    private static final int DEFAULT_RESOLUTION = 5;
+    private static final int NUM_PARTICLES_END = 2000;
+    private static final int DEFAULT_RESOLUTION = RESOLUTION;
 
-    private static final int RESAMPLE_COUNT_DOWN = 3;
+    private static final int RESAMPLE_COUNT_DOWN = 4;
     private int particleFilterCountDown;
 
     public ParticleFilter() {
         this.occupancyGrid = new OccupancyGrid(STARTING_WIDTH, STARTING_HEIGHT, DEFAULT_RESOLUTION);
-        
+
         particles = new ArrayList<>();
-        DirectedPoint pose = new DirectedPoint(0, 0, 0);
+        MyDirectedPoint pose = new MyDirectedPoint(0, 0, 0);
         for (int i = 0; i < NUM_PARTICLES_START; i++) {
             particles.add(new Particle(pose, occupancyGrid));
         }
@@ -63,7 +65,7 @@ public class ParticleFilter {
             double y = Util.randomDouble(-worldHeight, worldHeight);
             double angle = Util.randomDouble(0, 2 * Math.PI); // Random angle between 0 and 2π
 
-            DirectedPoint noisyPose = new DirectedPoint(x, y, angle);
+            MyDirectedPoint noisyPose = new MyDirectedPoint(x, y, angle);
             particles.add(new Particle(noisyPose, occupancyGrid));
         }
 
@@ -94,22 +96,22 @@ public class ParticleFilter {
 
     public void resample(int numParticles) {
         List<Particle> newParticles = new ArrayList<>();
-        
+
         // Calculate cumulative weights
         double[] cumulativeWeights = new double[particles.size()];
         cumulativeWeights[0] = particles.get(0).getWeight();
         for (int i = 1; i < particles.size(); i++) {
-            cumulativeWeights[i] = cumulativeWeights[i-1] + particles.get(i).getWeight();
+            cumulativeWeights[i] = cumulativeWeights[i - 1] + particles.get(i).getWeight();
         }
-        
+
         // Resample particles
         for (int i = 0; i < numParticles; i++) {
             double randomValue = Util.randomDouble(0, 1);
-            
+
             // Binary search to find the particle
             int left = 0;
             int right = particles.size() - 1;
-            
+
             while (left < right) {
                 int mid = (left + right) / 2;
                 if (cumulativeWeights[mid] < randomValue) {
@@ -118,16 +120,16 @@ public class ParticleFilter {
                     right = mid;
                 }
             }
-            
+
             // Add a copy of the selected particle
             newParticles.add(particles.get(left).copy());
         }
-        
+
         // Replace old particles with new ones
         particles = newParticles;
     }
 
-    public DirectedPoint getEstimatedPosition() {
+    public MyDirectedPoint getEstimatedPosition() {
         // return the position of the particle with the highest weight
         Particle bestParticle = particles.get(0);
         double bestWeight = bestParticle.getWeight();
@@ -149,7 +151,7 @@ public class ParticleFilter {
     }
 
     public void updateGrid(List<MyVector> lidarReadings) {
-        DirectedPoint pose = getEstimatedPosition();
+        MyDirectedPoint pose = getEstimatedPosition();
         occupancyGrid.updateGrid(pose, lidarReadings);
     }
 
@@ -160,7 +162,7 @@ public class ParticleFilter {
     public void update(double speed, double rotation, List<MyVector> lidarReadings) {
         predict(speed, rotation);
         updateWeights(lidarReadings);
-        
+
         // Calculate number of particles based on linear interpolation
         int numParticles;
         if (particleFilterCountDown > 0) {
@@ -214,21 +216,21 @@ public class ParticleFilter {
             Color particleColor = new Color(scaledValue);
             bufferedGraphics.setColor(particleColor);
 
-            DirectedPoint gridPose = particle.getGridPose();
+            MyDirectedPoint gridPose = particle.getGridPose();
 
             bufferedGraphics.drawOval(
-                (int) gridPose.getX() - radius, 
-                (int) gridPose.getY() - radius, 
-                2 * radius, 
-                2 * radius);
+                    (int) gridPose.getX() - radius,
+                    (int) gridPose.getY() - radius,
+                    2 * radius,
+                    2 * radius);
 
-            DirectedPoint end = gridPose.copy();
+            MyDirectedPoint end = gridPose.copy();
             end.move(radius * 3);
             bufferedGraphics.drawLine(
-                (int) gridPose.getX(), 
-                (int) gridPose.getY(), 
-                (int) end.getX(), 
-                (int) end.getY());
+                    (int) gridPose.getX(),
+                    (int) gridPose.getY(),
+                    (int) end.getX(),
+                    (int) end.getY());
         }
 
         bufferedGraphics.dispose();

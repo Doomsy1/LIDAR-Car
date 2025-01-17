@@ -8,18 +8,18 @@
 import java.util.List;
 
 public class Particle {
-    private final DirectedPoint pose;
+    private final MyDirectedPoint pose;
     private final OccupancyGrid occupancyGrid;
 
     private double weight;
 
-    private static final double POSITION_NOISE = 2.5;
-    private static final double ANGLE_NOISE = 0.1; 
+    private static final double POSITION_NOISE = 0.1;
+    private static final double ANGLE_NOISE = 0.01; 
 
-    public Particle(DirectedPoint position, OccupancyGrid occupancyGrid) {
+    public Particle(MyDirectedPoint position, OccupancyGrid occupancyGrid) {
         this.pose = position.copy();
         this.occupancyGrid = occupancyGrid;
-        this.weight = 0.0;
+        this.weight = 0.5;
     }
 
     public double getWeight() {
@@ -34,14 +34,14 @@ public class Particle {
         this.weight = weight;
     }
 
-    public DirectedPoint getPose() {
+    public MyDirectedPoint getPose() {
         return pose;
     }
 
-    public DirectedPoint getGridPose() {
+    public MyDirectedPoint getGridPose() {
         int x = occupancyGrid.worldToGridX(pose.getX());
         int y = occupancyGrid.worldToGridY(pose.getY());
-        return new DirectedPoint(x, y, pose.getAngle());
+        return new MyDirectedPoint(x, y, pose.getAngle());
     }
 
     public void updatePose(double speed, double rotation) {
@@ -62,15 +62,16 @@ public class Particle {
         for (MyVector reading : lidarReadings) {
             double expectedReading = simulateLidarReading(reading.getDirection());
             double error = reading.getMagnitude() - expectedReading;
-            double currentLogWeight = -((error * error) / (2 * 10 * 10));
+            double currentLogWeight = -((error * error) / (2 * 100));
             newLogWeight += currentLogWeight;
         }
 
-        this.weight = Math.exp(newLogWeight);
+        // convert to 0.0 - 1.0
+        this.weight = Util.logitToProb(newLogWeight);
     }
 
-    private double simulateLidarReading(Angle direction) {
-        DirectedPoint sensor = pose.copy();
+    private double simulateLidarReading(MyAngle direction) {
+        MyDirectedPoint sensor = pose.copy();
         sensor.rotate(direction);
         sensor.move(Lidar.MAX_DISTANCE);
 

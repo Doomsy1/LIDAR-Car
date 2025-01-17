@@ -29,11 +29,11 @@ public class OccupancyGrid {
     // log odds
     private static final double DEFAULT_LOG_ODDS = Util.probToLogit(0.5);
     private static final double LOG_ODDS_OCCUPIED = Util.probToLogit(0.75);
-    private static final double LOG_ODDS_FREE = Util.probToLogit(0.35);
+    private static final double LOG_ODDS_FREE = Util.probToLogit(0.25);
 
     // max and min log odds
-    private static final double MAX_LOG_ODDS = Util.probToLogit(0.95);
-    private static final double MIN_LOG_ODDS = Util.probToLogit(0.05);
+    private static final double MAX_LOG_ODDS = Util.probToLogit(0.99);
+    private static final double MIN_LOG_ODDS = Util.probToLogit(0.01);
 
     private static final double OCCUPIED_THRESHOLD = 0.7;
     private static final double FREE_THRESHOLD = 0.3;
@@ -269,9 +269,9 @@ public class OccupancyGrid {
         updateCellInImage(x, y);
     }
 
-    public void updateGrid(DirectedPoint pose, List<MyVector> lidarReadings) {
+    public void updateGrid(MyDirectedPoint pose, List<MyVector> lidarReadings) {
         for (MyVector reading : lidarReadings) {
-            DirectedPoint rayEnd = pose.copy();
+            MyDirectedPoint rayEnd = pose.copy();
             rayEnd.rotate(reading.getDirection());
             rayEnd.move(reading.getMagnitude());
 

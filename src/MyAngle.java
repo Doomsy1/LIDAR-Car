@@ -4,10 +4,10 @@
  * Angle class in radians
  */
 
-public class Angle {
+public class MyAngle {
     private double angle; // in radians
 
-    public Angle(double angle) {
+    public MyAngle(double angle) {
         this.angle = angle;
     }
 
@@ -32,12 +32,12 @@ public class Angle {
         this.angle = normalize(this.angle + angle);
     }
 
-    public void rotate(Angle other) {
+    public void rotate(MyAngle other) {
         this.angle = normalize(this.angle + other.getRadians());
     }
 
-    public Angle copy() {
-        return new Angle(angle);
+    public MyAngle copy() {
+        return new MyAngle(angle);
     }
 
     @Override

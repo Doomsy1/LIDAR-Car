@@ -23,14 +23,15 @@ public class LiCar {
         lidar = new Lidar();
         lidarReadings = new ArrayList<>();
 
-        particleFilter = new ParticleFilter(new OccupancyGrid("background.png", Color.BLACK, Color.WHITE, 1));
+        // particleFilter = new ParticleFilter(new OccupancyGrid("background.png", Color.BLACK, Color.WHITE, 1));
+        particleFilter = new ParticleFilter();
     }
 
-    public DirectedPoint getActualPosition() {
+    public MyDirectedPoint getActualPosition() {
         return tank.getPosition();
     }
 
-    public DirectedPoint getEstimatedPosition() {
+    public MyDirectedPoint getEstimatedPosition() {
         return particleFilter.getEstimatedPosition();
     }
 
@@ -47,7 +48,7 @@ public class LiCar {
     }
 
     private void drawCar(Graphics g) {
-        DirectedPoint tankPosition = tank.getPosition();
+        MyDirectedPoint tankPosition = tank.getPosition();
         lidar.draw(g, tankPosition);
         tank.draw(g);
     }
@@ -61,7 +62,7 @@ public class LiCar {
         int radius = 10;
         g.fillOval(x - radius, y - radius, radius * 2, radius * 2);
 
-        DirectedPoint end = getEstimatedPosition().copy();
+        MyDirectedPoint end = getEstimatedPosition().copy();
         end.move(radius * 3);
         int endX = (int) Math.round(end.getX() + width / 2);
         int endY = (int) Math.round(end.getY() + height / 2);
@@ -69,10 +70,10 @@ public class LiCar {
     }
 
     private void drawRays(Graphics g) {
-        DirectedPoint tankPosition = tank.getPosition();
+        MyDirectedPoint tankPosition = tank.getPosition();
         g.setColor(Color.RED);
         for (MyVector v : lidarReadings) {
-            DirectedPoint rayEnd = tankPosition.copy();
+            MyDirectedPoint rayEnd = tankPosition.copy();
             rayEnd.rotate(v.getDirection());
             rayEnd.move(v.getMagnitude());
             g.drawLine((int) tankPosition.getX(), (int) tankPosition.getY(), (int) rayEnd.getX(), (int) rayEnd.getY());
@@ -80,11 +81,11 @@ public class LiCar {
     }
 
     private void drawReadings(Graphics g) {
-        DirectedPoint tankPosition = tank.getPosition();
+        MyDirectedPoint tankPosition = tank.getPosition();
         int radius = 3;
         g.setColor(Color.GREEN);
         for (MyVector v : lidarReadings) {
-            DirectedPoint rayEnd = tankPosition.copy();
+            MyDirectedPoint rayEnd = tankPosition.copy();
             rayEnd.rotate(v.getDirection());
             rayEnd.move(v.getMagnitude());
             g.drawOval((int) rayEnd.getX() - radius, (int) rayEnd.getY() - radius, radius * 2, radius * 2);

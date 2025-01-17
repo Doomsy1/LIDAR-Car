@@ -10,7 +10,7 @@ import java.awt.Graphics;
 
 public class Tank {
     // Tank position
-    private final DirectedPoint position;
+    private final MyDirectedPoint position;
 
     // Movement keys
     public final int moveForward;
@@ -50,14 +50,13 @@ public class Tank {
     private final double SPEED_NOISE = 0.0;
     private final double ROTATION_NOISE = 0.0;
 
-    public Tank(int x, int y, double angle, int moveForward, int moveBackward, int rotateAntiClockwise,
-            int rotateClockwise) {
+    public Tank(int x, int y, double angle, int moveForward, int moveBackward, int rotateAntiClockwise, int rotateClockwise) {
         this.moveForward = moveForward;
         this.moveBackward = moveBackward;
         this.rotateAntiClockwise = rotateAntiClockwise;
         this.rotateClockwise = rotateClockwise;
 
-        position = new DirectedPoint(x, y, angle);
+        position = new MyDirectedPoint(x, y, angle);
 
         // Movement variables
         speed = 0;
@@ -68,7 +67,7 @@ public class Tank {
         rotationAcceleration = 0;
     }
 
-    public DirectedPoint getPosition() {
+    public MyDirectedPoint getPosition() {
         return position;
     }
 
@@ -114,9 +113,9 @@ public class Tank {
         position.move(speed);
     }
 
-    public void drawTire(Graphics g, DirectedPoint tire, Color color, boolean isDriveTire) {
+    public void drawTire(Graphics g, MyDirectedPoint tire, Color color, boolean isDriveTire) {
         g.setColor(color);
-        Angle angle = tire.getAngle();
+        MyAngle angle = tire.getAngle();
         int[] xPoints = new int[4];
         int[] yPoints = new int[4];
 
@@ -141,31 +140,31 @@ public class Tank {
     }
 
     public void draw(Graphics g) {
-        Angle perpendicularAngle = position.getAngle();
+        MyAngle perpendicularAngle = position.getAngle();
         perpendicularAngle.rotate(Math.PI / 2);
 
-        DirectedPoint middleLeft = position.copy();
+        MyDirectedPoint middleLeft = position.copy();
         middleLeft.move(TANK_WIDTH / 2, perpendicularAngle);
 
-        DirectedPoint middleRight = position.copy();
+        MyDirectedPoint middleRight = position.copy();
         middleRight.move(-TANK_WIDTH / 2, perpendicularAngle);
 
         drawTire(g, middleLeft, Color.RED, true);
         drawTire(g, middleRight, Color.RED, true);
 
-        DirectedPoint frontLeft = middleLeft.copy();
+        MyDirectedPoint frontLeft = middleLeft.copy();
         frontLeft.move(TANK_LENGTH / 3);
 
-        DirectedPoint frontRight = middleRight.copy();
+        MyDirectedPoint frontRight = middleRight.copy();
         frontRight.move(TANK_LENGTH / 3);
 
         drawTire(g, frontLeft, Color.GREEN, false);
         drawTire(g, frontRight, Color.GREEN, false);
 
-        DirectedPoint backLeft = middleLeft.copy();
+        MyDirectedPoint backLeft = middleLeft.copy();
         backLeft.move(-TANK_LENGTH / 3);
 
-        DirectedPoint backRight = middleRight.copy();
+        MyDirectedPoint backRight = middleRight.copy();
         backRight.move(-TANK_LENGTH / 3);
 
         drawTire(g, backLeft, Color.BLUE, false);

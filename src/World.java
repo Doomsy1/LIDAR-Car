@@ -45,7 +45,7 @@ public class World {
     private final LiCar licar;
 
     public World() {
-        this.licar = new LiCar(WORLD_WIDTH * 1/5, WORLD_HEIGHT * 1/4, 0,
+        this.licar = new LiCar(WORLD_WIDTH * 1 / 2, WORLD_HEIGHT * 1 / 2, 0,
                 KeyEvent.VK_W, KeyEvent.VK_S,
                 KeyEvent.VK_A, KeyEvent.VK_D);
     }
@@ -106,7 +106,7 @@ public class World {
 
         // Only apply car-following transformations if this is not the fixed world view
         if (centerCar) {
-            DirectedPoint tankPosition = licar.getActualPosition();
+            MyDirectedPoint tankPosition = licar.getActualPosition();
             double tankX = tankPosition.getX();
             double tankY = tankPosition.getY();
             double tankAngle = tankPosition.getAngle().getRadians();
@@ -163,7 +163,7 @@ public class World {
         }
     }
 
-    public void drawWorld(Graphics g) {
+    public void drawPOV(Graphics g) {
         Graphics2D g2d = (Graphics2D) g.create();
         try {
             drawView(

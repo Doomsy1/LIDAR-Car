@@ -9,26 +9,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Lidar {
-    private final Angle bearing;
+    private final MyAngle bearing;
 
     // tick = 1.8 degrees
     private static final double TICK = Math.PI / 180 * 1.8;
 
-    private static final double TICK_PER_SCAN = 7;
-    private static final int SCANS_PER_FRAME = 50;
+    private static final double TICK_PER_SCAN = 3;
+    private static final int SCANS_PER_FRAME = 67;
 
     public static final double MIN_DISTANCE = 1;
     public static final double MAX_DISTANCE = 250;
 
     private final double lidarRadius = 10;
 
-    public static final double READING_NOISE = 5.0;
+    public static final double READING_NOISE = 1.0;
 
     public Lidar() {
-        bearing = new Angle(0);
+        bearing = new MyAngle(0);
     }
 
-    public Angle getBearing() {
+    public MyAngle getBearing() {
         return bearing;
     }
 
@@ -40,8 +40,8 @@ public class Lidar {
         return new MyVector(bearing.copy(), reading + Util.randomGaussian(READING_NOISE));
     }
 
-    public MyVector read(DirectedPoint lidarPosition) {
-        DirectedPoint beam = lidarPosition.copy();
+    public MyVector read(MyDirectedPoint lidarPosition) {
+        MyDirectedPoint beam = lidarPosition.copy();
         beam.rotate(bearing); // Make the beam face in the direction of the lidar
         beam.move(MAX_DISTANCE);
 
@@ -58,7 +58,7 @@ public class Lidar {
         return new MyVector(bearing.copy(), MAX_DISTANCE);
     }
 
-    public List<MyVector> scan(DirectedPoint lidarPosition) {
+    public List<MyVector> scan(MyDirectedPoint lidarPosition) {
         List<MyVector> readings = new ArrayList<>();
         for (int i = 0; i < SCANS_PER_FRAME; i++) {
             readings.add(read(lidarPosition));
@@ -67,13 +67,13 @@ public class Lidar {
         return readings;
     }
 
-    public void draw(Graphics g, DirectedPoint lidarPosition) {
+    public void draw(Graphics g, MyDirectedPoint lidarPosition) {
         g.setColor(new Color(10, 10, 10, 32));
         g.drawOval((int) (lidarPosition.getX() - lidarRadius / 2), (int) (lidarPosition.getY() - lidarRadius / 2),
                 (int) lidarRadius, (int) lidarRadius);
 
         // Draw where the lidar is pointing
-        DirectedPoint sensor = lidarPosition.copy();
+        MyDirectedPoint sensor = lidarPosition.copy();
         sensor.rotate(bearing);
         sensor.move(MAX_DISTANCE);
         g.drawLine((int) lidarPosition.getX(), (int) lidarPosition.getY(), (int) sensor.getX(), (int) sensor.getY());
