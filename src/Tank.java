@@ -40,17 +40,18 @@ public class Tank {
     private final double TANK_LENGTH = 50;
     private final double TANK_WIDTH = 20;
 
-    private final double DRIVE_TIRE_LENGTH = 10;
+    private final double DRIVE_TIRE_LENGTH = 14;
     private final double DRIVE_TIRE_WIDTH = 5;
 
-    private final double SECONDARY_TIRE_LENGTH = 8;
-    private final double SECONDARY_TIRE_WIDTH = 4;
+    private final double SECONDARY_TIRE_LENGTH = 4;
+    private final double SECONDARY_TIRE_WIDTH = 2;
 
     // Noise constants
     private final double SPEED_NOISE = 0.0;
     private final double ROTATION_NOISE = 0.0;
 
-    public Tank(int x, int y, double angle, int moveForward, int moveBackward, int rotateAntiClockwise, int rotateClockwise) {
+    public Tank(int x, int y, double angle, int moveForward, int moveBackward, int rotateAntiClockwise,
+            int rotateClockwise) {
         this.moveForward = moveForward;
         this.moveBackward = moveBackward;
         this.rotateAntiClockwise = rotateAntiClockwise;
@@ -115,28 +116,11 @@ public class Tank {
 
     public void drawTire(Graphics g, MyDirectedPoint tire, Color color, boolean isDriveTire) {
         g.setColor(color);
-        MyAngle angle = tire.getAngle();
-        int[] xPoints = new int[4];
-        int[] yPoints = new int[4];
-
         // Use appropriate tire dimensions based on type
         double tireLength = isDriveTire ? DRIVE_TIRE_LENGTH : SECONDARY_TIRE_LENGTH;
         double tireWidth = isDriveTire ? DRIVE_TIRE_WIDTH : SECONDARY_TIRE_WIDTH;
 
-        // Calculate the points of the tire
-        xPoints[0] = (int) (tire.getX() - (tireLength / 2) * angle.getCos() - (tireWidth / 2) * angle.getSin());
-        yPoints[0] = (int) (tire.getY() - (tireLength / 2) * angle.getSin() + (tireWidth / 2) * angle.getCos());
-
-        xPoints[1] = (int) (tire.getX() + (tireLength / 2) * angle.getCos() - (tireWidth / 2) * angle.getSin());
-        yPoints[1] = (int) (tire.getY() + (tireLength / 2) * angle.getSin() + (tireWidth / 2) * angle.getCos());
-
-        xPoints[2] = (int) (tire.getX() + (tireLength / 2) * angle.getCos() + (tireWidth / 2) * angle.getSin());
-        yPoints[2] = (int) (tire.getY() + (tireLength / 2) * angle.getSin() - (tireWidth / 2) * angle.getCos());
-
-        xPoints[3] = (int) (tire.getX() - (tireLength / 2) * angle.getCos() + (tireWidth / 2) * angle.getSin());
-        yPoints[3] = (int) (tire.getY() - (tireLength / 2) * angle.getSin() - (tireWidth / 2) * angle.getCos());
-
-        g.fillPolygon(xPoints, yPoints, 4);
+        Util.drawOrientedRoundedRect(g, tire, (int) tireLength, (int) tireWidth, 2, true);
     }
 
     public void draw(Graphics g) {
@@ -169,5 +153,8 @@ public class Tank {
 
         drawTire(g, backLeft, Color.BLUE, false);
         drawTire(g, backRight, Color.BLUE, false);
+
+        g.setColor(new Color(64, 128, 128)); // Aquamarine color RGB values
+        Util.drawOrientedRoundedRect(g, position, (int) TANK_LENGTH, (int) TANK_WIDTH, 10, true);
     }
 }

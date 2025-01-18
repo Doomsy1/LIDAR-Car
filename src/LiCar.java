@@ -94,7 +94,7 @@ public class LiCar {
 
     public void draw(Graphics g, boolean drawRays, boolean drawReadings) {
         drawCar(g);
-        drawEstimatedPosition(g);
+        // drawEstimatedPosition(g);
 
         if (drawRays) {
             drawRays(g);

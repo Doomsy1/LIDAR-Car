@@ -44,6 +44,10 @@ public class MyDirectedPoint {
         return angle.copy();
     }
 
+    public double getRadians() {
+        return angle.getRadians();
+    }
+
     public void move(double distance) {
         point.move(distance, angle);
     }

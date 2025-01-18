@@ -19,7 +19,7 @@ public class ParticleFilter {
     private List<Particle> particles;
     private final OccupancyGrid occupancyGrid;
 
-    private static final int RESOLUTION = 1;
+    private static final int RESOLUTION = 4;
 
     private static final int STARTING_WIDTH = 800 / RESOLUTION;
     private static final int STARTING_HEIGHT = 600 / RESOLUTION;
@@ -27,8 +27,8 @@ public class ParticleFilter {
     private static final double INITIAL_POSITION_STDDEV = 50.0;
     private static final double INITIAL_BEARING_STDDEV = 0.0;
 
-    private static final int NUM_PARTICLES_START = 20000;
-    private static final int NUM_PARTICLES_END = 2000;
+    private static final int NUM_PARTICLES_START = 200;
+    private static final int NUM_PARTICLES_END = 200;
     private static final int DEFAULT_RESOLUTION = RESOLUTION;
 
     private static final int RESAMPLE_COUNT_DOWN = 4;
@@ -174,7 +174,7 @@ public class ParticleFilter {
         }
         resample(numParticles);
 
-        // updateGrid(lidarReadings);
+        updateGrid(lidarReadings);
     }
 
     public Color getColor(double probability) {
