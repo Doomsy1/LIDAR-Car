@@ -7,7 +7,7 @@
 
 import java.util.List;
 
-public class Particle {
+public class MyParticle {
     private final MyDirectedPoint pose;
     private final OccupancyGrid occupancyGrid;
 
@@ -16,7 +16,7 @@ public class Particle {
     private static final double POSITION_NOISE = 0.05;
     private static final double ANGLE_NOISE = 0.001;
 
-    public Particle(MyDirectedPoint position, OccupancyGrid occupancyGrid) {
+    public MyParticle(MyDirectedPoint position, OccupancyGrid occupancyGrid) {
         this.pose = position.copy();
         this.occupancyGrid = occupancyGrid;
         this.weight = 0.0;
@@ -101,8 +101,8 @@ public class Particle {
         return Lidar.MAX_DISTANCE;
     }
 
-    public Particle copy() {
-        Particle newParticle = new Particle(pose.copy(), occupancyGrid);
+    public MyParticle copy() {
+        MyParticle newParticle = new MyParticle(pose.copy(), occupancyGrid);
         newParticle.setWeight(weight);
         return newParticle;
     }
