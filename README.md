@@ -1,4 +1,3 @@
-[ ] add collisions
 [ ] load into a map (with the map known or unknown)
 [ ] save a map
 [ ] create a map using paint-like tool

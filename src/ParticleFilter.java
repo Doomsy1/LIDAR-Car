@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ParticleFilter {
-    private List<MyParticle> particles;
+    private List<Particle> particles;
     private final OccupancyGrid occupancyGrid;
 
     private static final int RESOLUTION = 4;
@@ -40,7 +40,7 @@ public class ParticleFilter {
         particles = new ArrayList<>();
         MyDirectedPoint pose = new MyDirectedPoint(0, 0, 0);
         for (int i = 0; i < NUM_PARTICLES_START; i++) {
-            particles.add(new MyParticle(pose, occupancyGrid));
+            particles.add(new Particle(pose, occupancyGrid));
         }
         particleFilterCountDown = 0;
     }
@@ -66,36 +66,36 @@ public class ParticleFilter {
             double angle = Util.randomDouble(0, 2 * Math.PI); // Random angle between 0 and 2π
 
             MyDirectedPoint noisyPose = new MyDirectedPoint(x, y, angle);
-            particles.add(new MyParticle(noisyPose, occupancyGrid));
+            particles.add(new Particle(noisyPose, occupancyGrid));
         }
 
         particleFilterCountDown = RESAMPLE_COUNT_DOWN;
     }
 
     public void predict(double speed, double rotation) {
-        for (MyParticle particle : particles) {
+        for (Particle particle : particles) {
             particle.updatePose(speed, rotation);
         }
     }
 
     public void updateWeights(List<MyVector> lidarReadings) {
         // update the weights of the particles
-        for (MyParticle particle : particles) {
+        for (Particle particle : particles) {
             particle.updateWeight(lidarReadings);
         }
 
         // // normalize the weights
         double sumWeights = 0.0;
-        for (MyParticle particle : particles) {
+        for (Particle particle : particles) {
             sumWeights += particle.getWeight();
         }
-        for (MyParticle particle : particles) {
+        for (Particle particle : particles) {
             particle.setWeight(particle.getWeight() / sumWeights);
         }
     }
 
     public void resample(int numParticles) {
-        List<MyParticle> newParticles = new ArrayList<>();
+        List<Particle> newParticles = new ArrayList<>();
 
         // Calculate cumulative weights
         double[] cumulativeWeights = new double[particles.size()];
@@ -131,9 +131,9 @@ public class ParticleFilter {
 
     public MyDirectedPoint getEstimatedPosition() {
         // return the position of the particle with the highest weight
-        MyParticle bestParticle = particles.get(0);
+        Particle bestParticle = particles.get(0);
         double bestWeight = bestParticle.getWeight();
-        for (MyParticle particle : particles) {
+        for (Particle particle : particles) {
             if (particle.getWeight() > bestWeight) {
                 bestWeight = particle.getWeight();
                 bestParticle = particle;
@@ -155,7 +155,7 @@ public class ParticleFilter {
         occupancyGrid.updateGrid(pose, lidarReadings);
     }
 
-    public List<MyParticle> getParticles() {
+    public List<Particle> getParticles() {
         return particles;
     }
 
@@ -206,7 +206,7 @@ public class ParticleFilter {
 
         // Draw particles on the buffered image
         int radius = 5;
-        for (MyParticle particle : particles) {
+        for (Particle particle : particles) {
             double logWeight = particle.getWeight();
 
             double probability = Util.logitToProb(logWeight);
